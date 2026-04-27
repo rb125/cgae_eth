@@ -1,6 +1,7 @@
 """Tests for registry, contracts, and economy."""
 
 import pytest
+from pathlib import Path
 from cgae_engine.gate import RobustnessVector, Tier, GateFunction
 from cgae_engine.registry import AgentRegistry, AgentStatus
 from cgae_engine.contracts import ContractManager, ContractStatus, Constraint
@@ -133,6 +134,61 @@ class TestEconomy:
         self.econ.audit_agent(record.agent_id, r)
         safety = self.econ.aggregate_safety()
         assert 0.0 <= safety <= 1.0
+
+    def test_step_produces_snapshot(self):
+        record = self.econ.register_agent("test", {"model": "test"})
+        r = RobustnessVector(cc=0.7, er=0.7, as_=0.6, ih=0.8)
+        self.econ.audit_agent(record.agent_id, r)
+        self.econ.step()
+        assert len(self.econ.snapshots) == 1
+        snap = self.econ.snapshots[0]
+        assert snap.num_agents >= 1
+        assert snap.aggregate_safety > 0
+
+    def test_step_advances_time(self):
+        self.econ.step()
+        assert self.econ.current_time == 1.0
+        self.econ.step()
+        assert self.econ.current_time == 2.0
+
+    def test_top_up_prevents_insolvency(self):
+        config = EconomyConfig(
+            initial_balance=0.002,  # very low
+            test_eth_top_up_threshold=0.01,
+            test_eth_top_up_amount=0.5,
+        )
+        econ = Economy(config=config)
+        record = econ.register_agent("test", {"model": "test"})
+        r = RobustnessVector(cc=0.7, er=0.7, as_=0.6, ih=0.8)
+        econ.audit_agent(record.agent_id, r)
+        # After audit cost, balance is very low — step should top up
+        econ.step()
+        assert record.balance > 0
+        assert record.status == AgentStatus.ACTIVE
+
+    def test_insolvency_without_topup(self):
+        config = EconomyConfig(
+            initial_balance=0.002,
+            test_eth_top_up_threshold=None,  # disabled
+            test_eth_top_up_amount=0.0,
+        )
+        econ = Economy(config=config)
+        record = econ.register_agent("test", {"model": "test"})
+        r = RobustnessVector(cc=0.7, er=0.7, as_=0.6, ih=0.8)
+        econ.audit_agent(record.agent_id, r)
+        econ.step()
+        assert record.status == AgentStatus.SUSPENDED
+
+    def test_export_state(self, tmp_path):
+        record = self.econ.register_agent("test", {"model": "test"})
+        r = RobustnessVector(cc=0.7, er=0.7, as_=0.6, ih=0.8)
+        self.econ.audit_agent(record.agent_id, r)
+        path = str(tmp_path / "state.json")
+        self.econ.export_state(path)
+        import json
+        data = json.loads(Path(path).read_text())
+        assert "agents" in data
+        assert "aggregate_safety" in data
 
 
 class TestTemporalDecay:
