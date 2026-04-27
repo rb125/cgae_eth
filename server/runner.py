@@ -33,7 +33,6 @@ from cgae_engine.registry import AgentRegistry, AgentStatus
 from cgae_engine.contracts import ContractManager, ContractStatus
 from cgae_engine.economy import Economy, EconomyConfig, EconomySnapshot
 from cgae_engine.marketplace import TaskMarketplace
-from cgae_engine.audit import AuditOrchestrator
 from agents.base import BaseAgent, AgentDecision
 from agents.strategies import create_agent_cohort
 
@@ -123,11 +122,14 @@ class SimulationRunner:
             self.economy.contracts,
             contracts_per_step=self.config.contracts_per_step,
         )
-        self.audit = AuditOrchestrator()
-
-        # Create agent cohort
         self.agents: dict[str, BaseAgent] = {}
         self.metrics = SimulationMetrics()
+
+    @staticmethod
+    def _noisy_robustness(r: RobustnessVector, noise: float = 0.03) -> RobustnessVector:
+        """Add small noise to a robustness vector for synthetic audits."""
+        def clamp(v): return max(0.0, min(1.0, v + random.gauss(0, noise)))
+        return RobustnessVector(cc=clamp(r.cc), er=clamp(r.er), as_=clamp(r.as_), ih=clamp(r.ih))
 
     def setup(self):
         """Register agents and run initial audits."""
@@ -142,14 +144,10 @@ class SimulationRunner:
             self.agents[record.agent_id] = agent
 
             # Initial audit with true robustness (+ small noise)
-            audit_result = self.audit.synthetic_audit(
-                record.agent_id,
-                base_robustness=agent.true_robustness,
-                noise_scale=0.03,
-            )
+            noisy_r = self._noisy_robustness(agent.true_robustness)
             self.economy.audit_agent(
                 record.agent_id,
-                audit_result.robustness,
+                noisy_r,
                 audit_type="registration",
             )
 
@@ -281,15 +279,11 @@ class SimulationRunner:
                         record.total_spent += cost
                         new_r = agent.invest_robustness(dim, amount)
                         # Re-audit with improved robustness
-                        audit_result = self.audit.synthetic_audit(
-                            agent_id,
-                            base_robustness=new_r,
-                            noise_scale=0.02,
-                        )
+                        noisy_r = self._noisy_robustness(new_r, 0.02)
                         old_tier = record.current_tier
                         self.economy.audit_agent(
                             agent_id,
-                            audit_result.robustness,
+                            noisy_r,
                             audit_type="upgrade",
                         )
                         new_tier = record.current_tier
@@ -305,10 +299,7 @@ class SimulationRunner:
         def audit_callback(aid):
             agent = self.agents.get(aid)
             if agent:
-                result = self.audit.synthetic_audit(
-                    aid, base_robustness=agent.true_robustness, noise_scale=0.04
-                )
-                return result.robustness
+                return self._noisy_robustness(agent.true_robustness, 0.04)
             return None
 
         self.economy.step(audit_callback=audit_callback)

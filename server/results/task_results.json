@@ -1,0 +1,1055 @@
+[
+  {
+    "agent": "conservative_0",
+    "task_id": "contract_a762c024c23b",
+    "tier": "T1",
+    "domain": "data_labeling",
+    "proof_cid": "0xe3788e9a12befa04d89985ec593eebf7",
+    "verification": {
+      "overall_pass": false,
+      "constraints_passed": [],
+      "constraints_failed": [
+        "format_compliance",
+        "completeness"
+      ]
+    },
+    "settlement": {
+      "reward": 0.0,
+      "penalty": 0.0008861255048430355
+    },
+    "output_preview": "Synthetic execution of contract_a762c024c23b: FAILURE"
+  },
+  {
+    "agent": "aggressive_1",
+    "task_id": "contract_6a04b2ca71e6",
+    "tier": "T1",
+    "domain": "summarization",
+    "proof_cid": "0x0de9d6b5ac920e35a143b7de2828138d",
+    "verification": {
+      "overall_pass": true,
+      "constraints_passed": [],
+      "constraints_failed": []
+    },
+    "settlement": {
+      "reward": 0.003092822574308115,
+      "penalty": 0.0
+    },
+    "output_preview": "Synthetic execution of contract_6a04b2ca71e6: SUCCESS"
+  },
+  {
+    "agent": "balanced_2",
+    "task_id": "contract_e254b22fba41",
+    "tier": "T2",
+    "domain": "analysis",
+    "proof_cid": "0x72bb23b6fddbea88e0dd14a2e40f95cb",
+    "verification": {
+      "overall_pass": true,
+      "constraints_passed": [],
+      "constraints_failed": []
+    },
+    "settlement": {
+      "reward": 0.017131906326090882,
+      "penalty": 0.0
+    },
+    "output_preview": "Synthetic execution of contract_e254b22fba41: SUCCESS"
+  },
+  {
+    "agent": "conservative_0",
+    "task_id": "contract_9d11e654a1af",
+    "tier": "T1",
+    "domain": "summarization",
+    "proof_cid": "0x10f8962cb9e6f69fbb4c32c81eaf51fa",
+    "verification": {
+      "overall_pass": true,
+      "constraints_passed": [],
+      "constraints_failed": []
+    },
+    "settlement": {
+      "reward": 0.002921718300802926,
+      "penalty": 0.0
+    },
+    "output_preview": "Synthetic execution of contract_9d11e654a1af: SUCCESS"
+  },
+  {
+    "agent": "aggressive_1",
+    "task_id": "contract_ea289c611e45",
+    "tier": "T1",
+    "domain": "summarization",
+    "proof_cid": "0xafdbb688086437a054dda6aafea164d5",
+    "verification": {
+      "overall_pass": true,
+      "constraints_passed": [],
+      "constraints_failed": []
+    },
+    "settlement": {
+      "reward": 0.003595345656288116,
+      "penalty": 0.0
+    },
+    "output_preview": "Synthetic execution of contract_ea289c611e45: SUCCESS"
+  },
+  {
+    "agent": "balanced_2",
+    "task_id": "contract_b97498b9138f",
+    "tier": "T2",
+    "domain": "analysis",
+    "proof_cid": "0xfd719cb4f2e7cde733c8bdfbb1ba22a3",
+    "verification": {
+      "overall_pass": true,
+      "constraints_passed": [],
+      "constraints_failed": []
+    },
+    "settlement": {
+      "reward": 0.014931634248173686,
+      "penalty": 0.0
+    },
+    "output_preview": "Synthetic execution of contract_b97498b9138f: SUCCESS"
+  },
+  {
+    "agent": "conservative_0",
+    "task_id": "contract_8f83ccb818b2",
+    "tier": "T1",
+    "domain": "summarization",
+    "proof_cid": "0x881a1b4fd780c04cf4eb02e07349fa16",
+    "verification": {
+      "overall_pass": true,
+      "constraints_passed": [],
+      "constraints_failed": []
+    },
+    "settlement": {
+      "reward": 0.0033689963973199716,
+      "penalty": 0.0
+    },
+    "output_preview": "Synthetic execution of contract_8f83ccb818b2: SUCCESS"
+  },
+  {
+    "agent": "balanced_2",
+    "task_id": "contract_d6f27d89c8ef",
+    "tier": "T2",
+    "domain": "analysis",
+    "proof_cid": "0xab250c0c87d8aab0cd891579832c533e",
+    "verification": {
+      "overall_pass": false,
+      "constraints_passed": [],
+      "constraints_failed": [
+        "format_compliance",
+        "accuracy",
+        "completeness"
+      ]
+    },
+    "settlement": {
+      "reward": 0.0,
+      "penalty": 0.009139094055898793
+    },
+    "output_preview": "Synthetic execution of contract_d6f27d89c8ef: FAILURE"
+  },
+  {
+    "agent": "conservative_0",
+    "task_id": "contract_26627eeeea32",
+    "tier": "T1",
+    "domain": "summarization",
+    "proof_cid": "0x393ded3cb91de8d0659b65697eb40420",
+    "verification": {
+      "overall_pass": true,
+      "constraints_passed": [],
+      "constraints_failed": []
+    },
+    "settlement": {
+      "reward": 0.003259430160947298,
+      "penalty": 0.0
+    },
+    "output_preview": "Synthetic execution of contract_26627eeeea32: SUCCESS"
+  },
+  {
+    "agent": "aggressive_1",
+    "task_id": "contract_5044b25e64ba",
+    "tier": "T1",
+    "domain": "summarization",
+    "proof_cid": "0x717dc9278dbae3187d2accd765517646",
+    "verification": {
+      "overall_pass": true,
+      "constraints_passed": [],
+      "constraints_failed": []
+    },
+    "settlement": {
+      "reward": 0.003514821998046617,
+      "penalty": 0.0
+    },
+    "output_preview": "Synthetic execution of contract_5044b25e64ba: SUCCESS"
+  },
+  {
+    "agent": "balanced_2",
+    "task_id": "contract_8a5344725b1b",
+    "tier": "T2",
+    "domain": "analysis",
+    "proof_cid": "0xb44a4ca6377c11611d8ecf66ca433482",
+    "verification": {
+      "overall_pass": false,
+      "constraints_passed": [],
+      "constraints_failed": [
+        "format_compliance",
+        "accuracy",
+        "completeness"
+      ]
+    },
+    "settlement": {
+      "reward": 0.0,
+      "penalty": 0.008961896034757435
+    },
+    "output_preview": "Synthetic execution of contract_8a5344725b1b: FAILURE"
+  },
+  {
+    "agent": "conservative_0",
+    "task_id": "contract_da1cc69e5fcf",
+    "tier": "T1",
+    "domain": "summarization",
+    "proof_cid": "0x3b18ea0666a093e5910678a11a119a2a",
+    "verification": {
+      "overall_pass": true,
+      "constraints_passed": [],
+      "constraints_failed": []
+    },
+    "settlement": {
+      "reward": 0.003510916587083468,
+      "penalty": 0.0
+    },
+    "output_preview": "Synthetic execution of contract_da1cc69e5fcf: SUCCESS"
+  },
+  {
+    "agent": "balanced_2",
+    "task_id": "contract_c24512d81eb2",
+    "tier": "T2",
+    "domain": "analysis",
+    "proof_cid": "0xa207087fb8f4d91e65a3246c12d7b671",
+    "verification": {
+      "overall_pass": true,
+      "constraints_passed": [],
+      "constraints_failed": []
+    },
+    "settlement": {
+      "reward": 0.015960199096491774,
+      "penalty": 0.0
+    },
+    "output_preview": "Synthetic execution of contract_c24512d81eb2: SUCCESS"
+  },
+  {
+    "agent": "conservative_0",
+    "task_id": "contract_774f2afce35d",
+    "tier": "T1",
+    "domain": "data_labeling",
+    "proof_cid": "0xf2c334d0b1eb999eeea1c89175518109",
+    "verification": {
+      "overall_pass": true,
+      "constraints_passed": [],
+      "constraints_failed": []
+    },
+    "settlement": {
+      "reward": 0.0019883315993203927,
+      "penalty": 0.0
+    },
+    "output_preview": "Synthetic execution of contract_774f2afce35d: SUCCESS"
+  },
+  {
+    "agent": "aggressive_1",
+    "task_id": "contract_30bae7d33b63",
+    "tier": "T1",
+    "domain": "summarization",
+    "proof_cid": "0x7b266462496c6df47778d5473897a8ec",
+    "verification": {
+      "overall_pass": true,
+      "constraints_passed": [],
+      "constraints_failed": []
+    },
+    "settlement": {
+      "reward": 0.003008547004842323,
+      "penalty": 0.0
+    },
+    "output_preview": "Synthetic execution of contract_30bae7d33b63: SUCCESS"
+  },
+  {
+    "agent": "balanced_2",
+    "task_id": "contract_267621db5452",
+    "tier": "T2",
+    "domain": "analysis",
+    "proof_cid": "0xd75813e6bbdd205ea4900a153f4f0ba2",
+    "verification": {
+      "overall_pass": false,
+      "constraints_passed": [],
+      "constraints_failed": [
+        "format_compliance",
+        "accuracy",
+        "completeness"
+      ]
+    },
+    "settlement": {
+      "reward": 0.0,
+      "penalty": 0.007750021247470094
+    },
+    "output_preview": "Synthetic execution of contract_267621db5452: FAILURE"
+  },
+  {
+    "agent": "adaptive_3",
+    "task_id": "contract_832d70fc55c6",
+    "tier": "T1",
+    "domain": "summarization",
+    "proof_cid": "0x7e0aa4424e9a6ac90ced69357f454c9c",
+    "verification": {
+      "overall_pass": true,
+      "constraints_passed": [],
+      "constraints_failed": []
+    },
+    "settlement": {
+      "reward": 0.002893322731259686,
+      "penalty": 0.0
+    },
+    "output_preview": "Synthetic execution of contract_832d70fc55c6: SUCCESS"
+  },
+  {
+    "agent": "conservative_0",
+    "task_id": "contract_abb67f7418ec",
+    "tier": "T1",
+    "domain": "summarization",
+    "proof_cid": "0xb80745d02c2cae2b14de66af7ced8639",
+    "verification": {
+      "overall_pass": false,
+      "constraints_passed": [],
+      "constraints_failed": [
+        "length_constraint",
+        "accuracy"
+      ]
+    },
+    "settlement": {
+      "reward": 0.0,
+      "penalty": 0.0008603322632052347
+    },
+    "output_preview": "Synthetic execution of contract_abb67f7418ec: FAILURE"
+  },
+  {
+    "agent": "aggressive_1",
+    "task_id": "contract_9b870ef54e9d",
+    "tier": "T1",
+    "domain": "summarization",
+    "proof_cid": "0x5ae50e8a2c6560a194cc21cefcb442b0",
+    "verification": {
+      "overall_pass": true,
+      "constraints_passed": [],
+      "constraints_failed": []
+    },
+    "settlement": {
+      "reward": 0.0029278471119178833,
+      "penalty": 0.0
+    },
+    "output_preview": "Synthetic execution of contract_9b870ef54e9d: SUCCESS"
+  },
+  {
+    "agent": "balanced_2",
+    "task_id": "contract_585e86184d7e",
+    "tier": "T2",
+    "domain": "analysis",
+    "proof_cid": "0x8a5fc294c236b93ecac0d4c870a4c398",
+    "verification": {
+      "overall_pass": true,
+      "constraints_passed": [],
+      "constraints_failed": []
+    },
+    "settlement": {
+      "reward": 0.016575064800450907,
+      "penalty": 0.0
+    },
+    "output_preview": "Synthetic execution of contract_585e86184d7e: SUCCESS"
+  },
+  {
+    "agent": "conservative_0",
+    "task_id": "contract_8405e50a5ebc",
+    "tier": "T1",
+    "domain": "data_labeling",
+    "proof_cid": "0x5f3870dc8ac36788dd6e4a60515f9fe3",
+    "verification": {
+      "overall_pass": false,
+      "constraints_passed": [],
+      "constraints_failed": [
+        "format_compliance",
+        "completeness"
+      ]
+    },
+    "settlement": {
+      "reward": 0.0,
+      "penalty": 0.0008988958950038638
+    },
+    "output_preview": "Synthetic execution of contract_8405e50a5ebc: FAILURE"
+  },
+  {
+    "agent": "aggressive_1",
+    "task_id": "contract_60e2abeab26f",
+    "tier": "T1",
+    "domain": "summarization",
+    "proof_cid": "0xb6d703438a944c5b6912fa5495ea950f",
+    "verification": {
+      "overall_pass": true,
+      "constraints_passed": [],
+      "constraints_failed": []
+    },
+    "settlement": {
+      "reward": 0.003537308426659982,
+      "penalty": 0.0
+    },
+    "output_preview": "Synthetic execution of contract_60e2abeab26f: SUCCESS"
+  },
+  {
+    "agent": "balanced_2",
+    "task_id": "contract_911afcedcc61",
+    "tier": "T2",
+    "domain": "translation",
+    "proof_cid": "0xd77412a07afea5bc9b32c6b4c9654928",
+    "verification": {
+      "overall_pass": false,
+      "constraints_passed": [],
+      "constraints_failed": [
+        "accuracy",
+        "terminology_consistency"
+      ]
+    },
+    "settlement": {
+      "reward": 0.0,
+      "penalty": 0.00625598776915143
+    },
+    "output_preview": "Synthetic execution of contract_911afcedcc61: FAILURE"
+  },
+  {
+    "agent": "conservative_0",
+    "task_id": "contract_47a2465077bf",
+    "tier": "T1",
+    "domain": "summarization",
+    "proof_cid": "0x962cc7636be73ebf96af5019fe8d96d0",
+    "verification": {
+      "overall_pass": true,
+      "constraints_passed": [],
+      "constraints_failed": []
+    },
+    "settlement": {
+      "reward": 0.0029931678043391063,
+      "penalty": 0.0
+    },
+    "output_preview": "Synthetic execution of contract_47a2465077bf: SUCCESS"
+  },
+  {
+    "agent": "balanced_2",
+    "task_id": "contract_74c517e69b09",
+    "tier": "T2",
+    "domain": "analysis",
+    "proof_cid": "0x715788df4865bb682a9f2df8d4143c76",
+    "verification": {
+      "overall_pass": true,
+      "constraints_passed": [],
+      "constraints_failed": []
+    },
+    "settlement": {
+      "reward": 0.016271054438836335,
+      "penalty": 0.0
+    },
+    "output_preview": "Synthetic execution of contract_74c517e69b09: SUCCESS"
+  },
+  {
+    "agent": "adaptive_3",
+    "task_id": "contract_28e3ff49574c",
+    "tier": "T1",
+    "domain": "summarization",
+    "proof_cid": "0xac2b041fa9422c6c6fad4780f4ec5aba",
+    "verification": {
+      "overall_pass": false,
+      "constraints_passed": [],
+      "constraints_failed": [
+        "length_constraint",
+        "accuracy"
+      ]
+    },
+    "settlement": {
+      "reward": 0.0,
+      "penalty": 0.0010996097044331404
+    },
+    "output_preview": "Synthetic execution of contract_28e3ff49574c: FAILURE"
+  },
+  {
+    "agent": "conservative_0",
+    "task_id": "contract_292b64d4eb34",
+    "tier": "T1",
+    "domain": "data_labeling",
+    "proof_cid": "0x0d9859a99ed15eab50872a8511ef3f4a",
+    "verification": {
+      "overall_pass": true,
+      "constraints_passed": [],
+      "constraints_failed": []
+    },
+    "settlement": {
+      "reward": 0.0016912697125799397,
+      "penalty": 0.0
+    },
+    "output_preview": "Synthetic execution of contract_292b64d4eb34: SUCCESS"
+  },
+  {
+    "agent": "aggressive_1",
+    "task_id": "contract_8bacab0d4544",
+    "tier": "T1",
+    "domain": "summarization",
+    "proof_cid": "0xaebf575423009fa0bb556d8f07851973",
+    "verification": {
+      "overall_pass": true,
+      "constraints_passed": [],
+      "constraints_failed": []
+    },
+    "settlement": {
+      "reward": 0.0029120889082303865,
+      "penalty": 0.0
+    },
+    "output_preview": "Synthetic execution of contract_8bacab0d4544: SUCCESS"
+  },
+  {
+    "agent": "balanced_2",
+    "task_id": "contract_12555ae63e88",
+    "tier": "T2",
+    "domain": "analysis",
+    "proof_cid": "0x3a02751becc8df4c6ca5035e784ba75b",
+    "verification": {
+      "overall_pass": true,
+      "constraints_passed": [],
+      "constraints_failed": []
+    },
+    "settlement": {
+      "reward": 0.01596256882315222,
+      "penalty": 0.0
+    },
+    "output_preview": "Synthetic execution of contract_12555ae63e88: SUCCESS"
+  },
+  {
+    "agent": "conservative_0",
+    "task_id": "contract_fa617f94d520",
+    "tier": "T1",
+    "domain": "summarization",
+    "proof_cid": "0x755485295416028ccd6c26d151d75609",
+    "verification": {
+      "overall_pass": true,
+      "constraints_passed": [],
+      "constraints_failed": []
+    },
+    "settlement": {
+      "reward": 0.002700441482894405,
+      "penalty": 0.0
+    },
+    "output_preview": "Synthetic execution of contract_fa617f94d520: SUCCESS"
+  },
+  {
+    "agent": "aggressive_1",
+    "task_id": "contract_88fd92bae684",
+    "tier": "T1",
+    "domain": "summarization",
+    "proof_cid": "0xa17f835b71f8220f03516b1a3b4c7f5a",
+    "verification": {
+      "overall_pass": true,
+      "constraints_passed": [],
+      "constraints_failed": []
+    },
+    "settlement": {
+      "reward": 0.0035963345699190756,
+      "penalty": 0.0
+    },
+    "output_preview": "Synthetic execution of contract_88fd92bae684: SUCCESS"
+  },
+  {
+    "agent": "balanced_2",
+    "task_id": "contract_58a6cf8906eb",
+    "tier": "T2",
+    "domain": "analysis",
+    "proof_cid": "0xdb3a9312247f8d1dbf9324f70165bbd2",
+    "verification": {
+      "overall_pass": false,
+      "constraints_passed": [],
+      "constraints_failed": [
+        "format_compliance",
+        "accuracy",
+        "completeness"
+      ]
+    },
+    "settlement": {
+      "reward": 0.0,
+      "penalty": 0.007427386419061029
+    },
+    "output_preview": "Synthetic execution of contract_58a6cf8906eb: FAILURE"
+  },
+  {
+    "agent": "conservative_0",
+    "task_id": "contract_0d0c5c4043dd",
+    "tier": "T1",
+    "domain": "summarization",
+    "proof_cid": "0xac1b7ebde0853facfcccd71df1e6c12a",
+    "verification": {
+      "overall_pass": false,
+      "constraints_passed": [],
+      "constraints_failed": [
+        "length_constraint",
+        "accuracy"
+      ]
+    },
+    "settlement": {
+      "reward": 0.0,
+      "penalty": 0.0008974923624300554
+    },
+    "output_preview": "Synthetic execution of contract_0d0c5c4043dd: FAILURE"
+  },
+  {
+    "agent": "balanced_2",
+    "task_id": "contract_2f565829d3bb",
+    "tier": "T2",
+    "domain": "translation",
+    "proof_cid": "0xf359c2dae17fab61b523d962e160893f",
+    "verification": {
+      "overall_pass": false,
+      "constraints_passed": [],
+      "constraints_failed": [
+        "accuracy",
+        "terminology_consistency"
+      ]
+    },
+    "settlement": {
+      "reward": 0.0,
+      "penalty": 0.005373133305998998
+    },
+    "output_preview": "Synthetic execution of contract_2f565829d3bb: FAILURE"
+  },
+  {
+    "agent": "conservative_0",
+    "task_id": "contract_eee77bdc994a",
+    "tier": "T1",
+    "domain": "data_labeling",
+    "proof_cid": "0x96c179c1294253c64178491b45cd2965",
+    "verification": {
+      "overall_pass": true,
+      "constraints_passed": [],
+      "constraints_failed": []
+    },
+    "settlement": {
+      "reward": 0.0018998728718202518,
+      "penalty": 0.0
+    },
+    "output_preview": "Synthetic execution of contract_eee77bdc994a: SUCCESS"
+  },
+  {
+    "agent": "aggressive_1",
+    "task_id": "contract_ee6438a35eb2",
+    "tier": "T1",
+    "domain": "summarization",
+    "proof_cid": "0x66ec2a457304d380e1219388b1d3f0cc",
+    "verification": {
+      "overall_pass": true,
+      "constraints_passed": [],
+      "constraints_failed": []
+    },
+    "settlement": {
+      "reward": 0.0035210980724190246,
+      "penalty": 0.0
+    },
+    "output_preview": "Synthetic execution of contract_ee6438a35eb2: SUCCESS"
+  },
+  {
+    "agent": "balanced_2",
+    "task_id": "contract_2df338eb83dc",
+    "tier": "T2",
+    "domain": "translation",
+    "proof_cid": "0x687de0274a2f0b6e66f5c47459872e19",
+    "verification": {
+      "overall_pass": false,
+      "constraints_passed": [],
+      "constraints_failed": [
+        "accuracy",
+        "terminology_consistency"
+      ]
+    },
+    "settlement": {
+      "reward": 0.0,
+      "penalty": 0.00642626612567779
+    },
+    "output_preview": "Synthetic execution of contract_2df338eb83dc: FAILURE"
+  },
+  {
+    "agent": "conservative_0",
+    "task_id": "contract_3971377c6105",
+    "tier": "T1",
+    "domain": "data_labeling",
+    "proof_cid": "0xa375d7b10b82ba39f65dc4a0f4f717d5",
+    "verification": {
+      "overall_pass": true,
+      "constraints_passed": [],
+      "constraints_failed": []
+    },
+    "settlement": {
+      "reward": 0.0021170724871124183,
+      "penalty": 0.0
+    },
+    "output_preview": "Synthetic execution of contract_3971377c6105: SUCCESS"
+  },
+  {
+    "agent": "aggressive_1",
+    "task_id": "contract_2637144a151c",
+    "tier": "T1",
+    "domain": "summarization",
+    "proof_cid": "0x9f244b6e27a1f78ab7a2dc20cb571a22",
+    "verification": {
+      "overall_pass": true,
+      "constraints_passed": [],
+      "constraints_failed": []
+    },
+    "settlement": {
+      "reward": 0.003491553374783192,
+      "penalty": 0.0
+    },
+    "output_preview": "Synthetic execution of contract_2637144a151c: SUCCESS"
+  },
+  {
+    "agent": "balanced_2",
+    "task_id": "contract_9205ea050b7a",
+    "tier": "T2",
+    "domain": "analysis",
+    "proof_cid": "0x6da58ecd76cd5116a3f1e1b7c49e1661",
+    "verification": {
+      "overall_pass": false,
+      "constraints_passed": [],
+      "constraints_failed": [
+        "format_compliance",
+        "accuracy",
+        "completeness"
+      ]
+    },
+    "settlement": {
+      "reward": 0.0,
+      "penalty": 0.0073222969451566585
+    },
+    "output_preview": "Synthetic execution of contract_9205ea050b7a: FAILURE"
+  },
+  {
+    "agent": "conservative_0",
+    "task_id": "contract_0f3319c6939c",
+    "tier": "T1",
+    "domain": "summarization",
+    "proof_cid": "0x9f998a50c6209104f43a76d6d0e42916",
+    "verification": {
+      "overall_pass": true,
+      "constraints_passed": [],
+      "constraints_failed": []
+    },
+    "settlement": {
+      "reward": 0.0032283367964970762,
+      "penalty": 0.0
+    },
+    "output_preview": "Synthetic execution of contract_0f3319c6939c: SUCCESS"
+  },
+  {
+    "agent": "aggressive_1",
+    "task_id": "contract_d287fc801e29",
+    "tier": "T1",
+    "domain": "summarization",
+    "proof_cid": "0xdc5f0585641df466fcf27a2d3a0b85ea",
+    "verification": {
+      "overall_pass": true,
+      "constraints_passed": [],
+      "constraints_failed": []
+    },
+    "settlement": {
+      "reward": 0.003462496540679495,
+      "penalty": 0.0
+    },
+    "output_preview": "Synthetic execution of contract_d287fc801e29: SUCCESS"
+  },
+  {
+    "agent": "balanced_2",
+    "task_id": "contract_5a3f9486d106",
+    "tier": "T2",
+    "domain": "analysis",
+    "proof_cid": "0x3640e5366d7bb6e6c8effdb253495184",
+    "verification": {
+      "overall_pass": false,
+      "constraints_passed": [],
+      "constraints_failed": [
+        "format_compliance",
+        "accuracy",
+        "completeness"
+      ]
+    },
+    "settlement": {
+      "reward": 0.0,
+      "penalty": 0.008918329919924212
+    },
+    "output_preview": "Synthetic execution of contract_5a3f9486d106: FAILURE"
+  },
+  {
+    "agent": "conservative_0",
+    "task_id": "contract_8e0f8276ec96",
+    "tier": "T1",
+    "domain": "summarization",
+    "proof_cid": "0xd36516b07eb0023c9c137bf47109f7c5",
+    "verification": {
+      "overall_pass": true,
+      "constraints_passed": [],
+      "constraints_failed": []
+    },
+    "settlement": {
+      "reward": 0.0027865341836955915,
+      "penalty": 0.0
+    },
+    "output_preview": "Synthetic execution of contract_8e0f8276ec96: SUCCESS"
+  },
+  {
+    "agent": "aggressive_1",
+    "task_id": "contract_067db520271d",
+    "tier": "T1",
+    "domain": "summarization",
+    "proof_cid": "0xf7277144f75d7e1506a28bd20afaab7c",
+    "verification": {
+      "overall_pass": true,
+      "constraints_passed": [],
+      "constraints_failed": []
+    },
+    "settlement": {
+      "reward": 0.003095908060660085,
+      "penalty": 0.0
+    },
+    "output_preview": "Synthetic execution of contract_067db520271d: SUCCESS"
+  },
+  {
+    "agent": "balanced_2",
+    "task_id": "contract_36f16cd4c323",
+    "tier": "T2",
+    "domain": "analysis",
+    "proof_cid": "0x629030341cbe0e7a5f84c0a4313b7c33",
+    "verification": {
+      "overall_pass": true,
+      "constraints_passed": [],
+      "constraints_failed": []
+    },
+    "settlement": {
+      "reward": 0.016878317886726356,
+      "penalty": 0.0
+    },
+    "output_preview": "Synthetic execution of contract_36f16cd4c323: SUCCESS"
+  },
+  {
+    "agent": "conservative_0",
+    "task_id": "contract_6dd7a4c98a14",
+    "tier": "T1",
+    "domain": "data_labeling",
+    "proof_cid": "0x37a294db63ae2a5c16e66e3558d201f4",
+    "verification": {
+      "overall_pass": false,
+      "constraints_passed": [],
+      "constraints_failed": [
+        "format_compliance",
+        "completeness"
+      ]
+    },
+    "settlement": {
+      "reward": 0.0,
+      "penalty": 0.0008629637103380356
+    },
+    "output_preview": "Synthetic execution of contract_6dd7a4c98a14: FAILURE"
+  },
+  {
+    "agent": "aggressive_1",
+    "task_id": "contract_58271e8e7624",
+    "tier": "T1",
+    "domain": "summarization",
+    "proof_cid": "0x1c76c89a21147c831205cee5b0102f04",
+    "verification": {
+      "overall_pass": true,
+      "constraints_passed": [],
+      "constraints_failed": []
+    },
+    "settlement": {
+      "reward": 0.003289162870942104,
+      "penalty": 0.0
+    },
+    "output_preview": "Synthetic execution of contract_58271e8e7624: SUCCESS"
+  },
+  {
+    "agent": "balanced_2",
+    "task_id": "contract_32cd9acee782",
+    "tier": "T2",
+    "domain": "analysis",
+    "proof_cid": "0x471176d4ac6d4ed3a3735c35278ee5f0",
+    "verification": {
+      "overall_pass": false,
+      "constraints_passed": [],
+      "constraints_failed": [
+        "format_compliance",
+        "accuracy",
+        "completeness"
+      ]
+    },
+    "settlement": {
+      "reward": 0.0,
+      "penalty": 0.0077242034277661235
+    },
+    "output_preview": "Synthetic execution of contract_32cd9acee782: FAILURE"
+  },
+  {
+    "agent": "conservative_0",
+    "task_id": "contract_aa1a90a8659f",
+    "tier": "T1",
+    "domain": "data_labeling",
+    "proof_cid": "0x65e0363ece76458545f2bb0944cff748",
+    "verification": {
+      "overall_pass": false,
+      "constraints_passed": [],
+      "constraints_failed": [
+        "format_compliance",
+        "completeness"
+      ]
+    },
+    "settlement": {
+      "reward": 0.0,
+      "penalty": 0.0008886288235577006
+    },
+    "output_preview": "Synthetic execution of contract_aa1a90a8659f: FAILURE"
+  },
+  {
+    "agent": "aggressive_1",
+    "task_id": "contract_8efbb7f13ac3",
+    "tier": "T1",
+    "domain": "summarization",
+    "proof_cid": "0x15e8f78016312c17dedd87590b4a2f8f",
+    "verification": {
+      "overall_pass": true,
+      "constraints_passed": [],
+      "constraints_failed": []
+    },
+    "settlement": {
+      "reward": 0.003413381231777636,
+      "penalty": 0.0
+    },
+    "output_preview": "Synthetic execution of contract_8efbb7f13ac3: SUCCESS"
+  },
+  {
+    "agent": "balanced_2",
+    "task_id": "contract_703bc5dcee48",
+    "tier": "T2",
+    "domain": "translation",
+    "proof_cid": "0xda3f3aa1ada8a769100280d73c08adcf",
+    "verification": {
+      "overall_pass": true,
+      "constraints_passed": [],
+      "constraints_failed": []
+    },
+    "settlement": {
+      "reward": 0.013512177627600068,
+      "penalty": 0.0
+    },
+    "output_preview": "Synthetic execution of contract_703bc5dcee48: SUCCESS"
+  },
+  {
+    "agent": "conservative_0",
+    "task_id": "contract_40435ef07179",
+    "tier": "T1",
+    "domain": "summarization",
+    "proof_cid": "0xe46a41ebb316b37aa5588d29cf4ea185",
+    "verification": {
+      "overall_pass": true,
+      "constraints_passed": [],
+      "constraints_failed": []
+    },
+    "settlement": {
+      "reward": 0.0032146772646714974,
+      "penalty": 0.0
+    },
+    "output_preview": "Synthetic execution of contract_40435ef07179: SUCCESS"
+  },
+  {
+    "agent": "balanced_2",
+    "task_id": "contract_a37bf191435e",
+    "tier": "T2",
+    "domain": "analysis",
+    "proof_cid": "0xcc164736fab643f47206c2a8c796984b",
+    "verification": {
+      "overall_pass": true,
+      "constraints_passed": [],
+      "constraints_failed": []
+    },
+    "settlement": {
+      "reward": 0.015496437087518517,
+      "penalty": 0.0
+    },
+    "output_preview": "Synthetic execution of contract_a37bf191435e: SUCCESS"
+  },
+  {
+    "agent": "conservative_0",
+    "task_id": "contract_9d22852235bd",
+    "tier": "T1",
+    "domain": "data_labeling",
+    "proof_cid": "0x656c161d92f950dad015528889fe52bc",
+    "verification": {
+      "overall_pass": false,
+      "constraints_passed": [],
+      "constraints_failed": [
+        "format_compliance",
+        "completeness"
+      ]
+    },
+    "settlement": {
+      "reward": 0.0,
+      "penalty": 0.000877606470489028
+    },
+    "output_preview": "Synthetic execution of contract_9d22852235bd: FAILURE"
+  },
+  {
+    "agent": "aggressive_1",
+    "task_id": "contract_ef2cb460c2c2",
+    "tier": "T1",
+    "domain": "summarization",
+    "proof_cid": "0x139e54cdb1ba712213c401e295a3ec59",
+    "verification": {
+      "overall_pass": true,
+      "constraints_passed": [],
+      "constraints_failed": []
+    },
+    "settlement": {
+      "reward": 0.0033337488446999112,
+      "penalty": 0.0
+    },
+    "output_preview": "Synthetic execution of contract_ef2cb460c2c2: SUCCESS"
+  },
+  {
+    "agent": "balanced_2",
+    "task_id": "contract_6bf723ac3a92",
+    "tier": "T2",
+    "domain": "translation",
+    "proof_cid": "0xba0267f54737fb6a8656055389919db6",
+    "verification": {
+      "overall_pass": false,
+      "constraints_passed": [],
+      "constraints_failed": [
+        "accuracy",
+        "terminology_consistency"
+      ]
+    },
+    "settlement": {
+      "reward": 0.0,
+      "penalty": 0.005073162019464485
+    },
+    "output_preview": "Synthetic execution of contract_6bf723ac3a92: FAILURE"
+  },
+  {
+    "agent": "adaptive_3",
+    "task_id": "contract_eca507c33880",
+    "tier": "T1",
+    "domain": "summarization",
+    "proof_cid": "0x147ec0fe2fd131f24e0042d69b6c2f73",
+    "verification": {
+      "overall_pass": false,
+      "constraints_passed": [],
+      "constraints_failed": [
+        "length_constraint",
+        "accuracy"
+      ]
+    },
+    "settlement": {
+      "reward": 0.0,
+      "penalty": 0.001113520143773937
+    },
+    "output_preview": "Synthetic execution of contract_eca507c33880: FAILURE"
+  }
+]

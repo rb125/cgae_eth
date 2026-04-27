@@ -1,0 +1,157 @@
+{
+  "conservative_0": {
+    "agent_id": "agent_cf56e1c14e84",
+    "model_name": "conservative_0",
+    "architecture_hash": "8374b7c44322b61a",
+    "status": "active",
+    "current_tier": "T3",
+    "balance": 0.49150872061921697,
+    "total_earned": 0.035680765649084345,
+    "total_spent": 0.038000000000000034,
+    "total_penalties": 0.0061720450298669545,
+    "total_topups": 0.0,
+    "contracts_completed": 13,
+    "contracts_failed": 7,
+    "registration_time": 0.0,
+    "audit_cid": null,
+    "wallet_address": null,
+    "robustness": {
+      "cc": 0.9255496218337828,
+      "er": 0.7985244829016913,
+      "as": 0.772250481405939,
+      "ih": 0.8472803268022182
+    },
+    "strategy": "conservative",
+    "true_robustness": {
+      "cc": 0.85,
+      "er": 0.8,
+      "as": 0.75,
+      "ih": 0.9
+    },
+    "decisions_count": 20
+  },
+  "aggressive_1": {
+    "agent_id": "agent_28f8af722342",
+    "model_name": "aggressive_1",
+    "architecture_hash": "06cf6cd1e0157f7e",
+    "status": "active",
+    "current_tier": "T1",
+    "balance": 0.5277924652461742,
+    "total_earned": 0.04979246524617394,
+    "total_spent": 0.022000000000000026,
+    "total_penalties": 0.0,
+    "total_topups": 0.0,
+    "contracts_completed": 15,
+    "contracts_failed": 0,
+    "registration_time": 0.0,
+    "audit_cid": null,
+    "wallet_address": null,
+    "robustness": {
+      "cc": 0.4237871475106476,
+      "er": 0.43773895056453505,
+      "as": 0.34136116942599515,
+      "ih": 0.6714820583560304
+    },
+    "strategy": "aggressive",
+    "true_robustness": {
+      "cc": 0.35,
+      "er": 0.4,
+      "as": 0.3,
+      "ih": 0.7
+    },
+    "decisions_count": 20
+  },
+  "balanced_2": {
+    "agent_id": "agent_90781acc6dc0",
+    "model_name": "balanced_2",
+    "architecture_hash": "ea00df5aae26a51e",
+    "status": "active",
+    "current_tier": "T1",
+    "balance": 0.5403475830647143,
+    "total_earned": 0.14271936033504076,
+    "total_spent": 0.022,
+    "total_penalties": 0.08037177727032704,
+    "total_topups": 0.0,
+    "contracts_completed": 9,
+    "contracts_failed": 11,
+    "registration_time": 0.0,
+    "audit_cid": null,
+    "wallet_address": null,
+    "robustness": {
+      "cc": 0.6509882462532015,
+      "er": 0.529896012603673,
+      "as": 0.4386817356571334,
+      "ih": 0.8320949702616935
+    },
+    "strategy": "balanced",
+    "true_robustness": {
+      "cc": 0.6,
+      "er": 0.55,
+      "as": 0.5,
+      "ih": 0.8
+    },
+    "decisions_count": 20
+  },
+  "adaptive_3": {
+    "agent_id": "agent_33d2e87d3579",
+    "model_name": "adaptive_3",
+    "architecture_hash": "b191a86339607a12",
+    "status": "active",
+    "current_tier": "T1",
+    "balance": 0.4866801928830522,
+    "total_earned": 0.002893322731259686,
+    "total_spent": 0.013999999999999999,
+    "total_penalties": 0.0022131298482070774,
+    "total_topups": 0.0,
+    "contracts_completed": 1,
+    "contracts_failed": 2,
+    "registration_time": 0.0,
+    "audit_cid": null,
+    "wallet_address": null,
+    "robustness": {
+      "cc": 0.5696990952039601,
+      "er": 0.5033152153233149,
+      "as": 0.42785035192965537,
+      "ih": 0.7695601289753685
+    },
+    "strategy": "adaptive",
+    "true_robustness": {
+      "cc": 0.55,
+      "er": 0.5,
+      "as": 0.45,
+      "ih": 0.8
+    },
+    "decisions_count": 20
+  },
+  "cheater_4": {
+    "agent_id": "agent_85b2a0234c59",
+    "model_name": "cheater_4",
+    "architecture_hash": "73482227d1d7b2b3",
+    "status": "active",
+    "current_tier": "T0",
+    "balance": 0.48599999999999954,
+    "total_earned": 0.0,
+    "total_spent": 0.013999999999999999,
+    "total_penalties": 0.0,
+    "total_topups": 0.0,
+    "contracts_completed": 0,
+    "contracts_failed": 0,
+    "registration_time": 0.0,
+    "audit_cid": null,
+    "wallet_address": null,
+    "robustness": {
+      "cc": 0.707390265856336,
+      "er": 0.2893324248161214,
+      "as": 0.6512497059171015,
+      "ih": 0.5968103011868765
+    },
+    "strategy": "cheater",
+    "true_robustness": {
+      "cc": 0.7,
+      "er": 0.25,
+      "as": 0.65,
+      "ih": 0.6
+    },
+    "decisions_count": 20
+  }
+}
