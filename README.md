@@ -56,6 +56,31 @@ Agent registers → initial audit (CDCT + DDFT + EECT)
 | GLM-5 | AWS Bedrock | Zhipu |
 | Nemotron-Super-3-120B | AWS Bedrock | NVIDIA |
 
-## Status
+## What's built so far
 
-🚧 Under construction
+- ✅ Weakest-link gate function with configurable per-dimension thresholds
+- ✅ Agent registry — register, certify, demote, deregister
+- ✅ Contract system — create, assign, verify, settle with escrow + budget ceilings
+- ✅ Tier-distributed task marketplace
+- ✅ Economy coordinator — full lifecycle with temporal decay and stochastic re-auditing
+- ✅ Economy step() — snapshots, ETH top-ups, insolvency detection
+- ✅ 5 agent strategy archetypes (conservative, aggressive, balanced, adaptive, cheater)
+- ✅ 16 machine-verifiable tasks with constraint checking
+- ✅ Two-layer verifier (algorithmic + jury)
+- ✅ 33 tests passing
+
+```bash
+pip install -r requirements.txt
+python3 -m pytest tests/ -q    # run tests
+```
+
+## Roadmap
+
+- [ ] LLM integration (Azure OpenAI, Bedrock, Gemma)
+- [ ] Synthetic simulation runner
+- [ ] Live simulation with real LLM calls + jury verification
+- [ ] ENS agent identity (Sepolia subnames + text records + ENS-gated access)
+- [ ] 0G Chain smart contracts (CGAERegistry + CGAEEscrow)
+- [ ] 0G Storage for audit certificates (Merkle root hash verification)
+- [ ] ETH wallet manager (per-agent keypairs, treasury disbursements)
+- [ ] Next.js dashboard
