@@ -67,20 +67,25 @@ Agent registers → initial audit (CDCT + DDFT + EECT)
 - ✅ 5 agent strategy archetypes (conservative, aggressive, balanced, adaptive, cheater)
 - ✅ 16 machine-verifiable tasks with constraint checking
 - ✅ Two-layer verifier (algorithmic + jury)
+- ✅ LLM agent with Azure OpenAI, Bedrock Converse, and Gemma support (14 models)
+- ✅ CDCT/DDFT/EECT framework clients + audit orchestrator
+- ✅ Autonomous agent v2 with EV/RAEV planning
+- ✅ Live simulation runner — real LLM calls, jury verification, cost accounting
+- ✅ Synthetic simulation runner (no API keys needed)
 - ✅ 33 tests passing
 
 ```bash
 pip install -r requirements.txt
-python3 -m pytest tests/ -q    # run tests
+python3 -m pytest tests/ -q          # run tests
+python3 -m server.runner --steps 50  # synthetic simulation
+python3 -m server.live_runner        # live simulation (requires .env)
 ```
 
 ## Roadmap
 
-- [ ] LLM integration (Azure OpenAI, Bedrock, Gemma)
-- [ ] Synthetic simulation runner
-- [ ] Live simulation with real LLM calls + jury verification
 - [ ] ENS agent identity (Sepolia subnames + text records + ENS-gated access)
 - [ ] 0G Chain smart contracts (CGAERegistry + CGAEEscrow)
 - [ ] 0G Storage for audit certificates (Merkle root hash verification)
 - [ ] ETH wallet manager (per-agent keypairs, treasury disbursements)
+- [ ] On-chain bridge (write certifications to CGAERegistry)
 - [ ] Next.js dashboard
