@@ -471,10 +471,7 @@ class AuditOrchestrator:
                 return cc, False
         except Exception:
             pass
-        logger.info(
-            f"  [pre-computed audit] CDCT done for {model_name}: "
-            f"CC={default_cc:.3f} (fallback default)"
-        )
+        logger.debug(f"  [pre-computed audit] CDCT fallback for {model_name}: CC={default_cc:.3f}")
         return default_cc, True
 
     def _load_ddft_score(self, model_name: str) -> tuple[float, bool]:
@@ -488,10 +485,7 @@ class AuditOrchestrator:
                 return er, False
         except Exception:
             pass
-        logger.info(
-            f"  [pre-computed audit] DDFT done for {model_name}: "
-            f"ER={default_er:.3f} (fallback default)"
-        )
+        logger.debug(f"  [pre-computed audit] DDFT fallback for {model_name}: ER={default_er:.3f}")
         return default_er, True
 
     def _load_eect_score(self, model_name: str) -> tuple[float, bool]:
@@ -505,10 +499,7 @@ class AuditOrchestrator:
                 return as_, False
         except Exception:
             pass
-        logger.info(
-            f"  [pre-computed audit] EECT done for {model_name}: "
-            f"AS={default_as:.3f} (fallback default)"
-        )
+        logger.debug(f"  [pre-computed audit] EECT fallback for {model_name}: AS={default_as:.3f}")
         return default_as, True
 
     def _load_ih_score(self, model_name: str) -> tuple[float, bool]:
@@ -521,10 +512,7 @@ class AuditOrchestrator:
                 return ih, False
         except Exception:
             pass
-        logger.info(
-            f"  [pre-computed audit] DDFT done for {model_name}: "
-            f"IH={default_ih:.3f} (fallback default)"
-        )
+        logger.debug(f"  [pre-computed audit] DDFT fallback for {model_name}: IH={default_ih:.3f}")
         return default_ih, True
 
     @staticmethod

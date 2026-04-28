@@ -1,0 +1,22 @@
+{
+  "network": "zgTestnet",
+  "chainId": 16602,
+  "deployedAt": "2026-04-25T20:23:43.280Z",
+  "deployer": "0xCE2de05Cd27DBCFe07b9d7862aa69301991c8592",
+  "contracts": {
+    "CGAERegistry": {
+      "address": "0xc4Ff2BC9855483eE3806eE08112cdC30dBf6b27A",
+      "deployTx": "0x37ef76d5b40ed9fa6896c28df7e21a7c6271057ab77c44ef201edd0d8b85d271"
+    },
+    "CGAEEscrow": {
+      "address": "0xA236106DE28FE9480509e06d1750dcfA4474bcfB",
+      "deployTx": "0xb8cc59fb3cd624727e61314c1dc5fb1b70a6a868101378ab5b2456608bc6776d"
+    }
+  },
+  "rpc": "https://evmrpc-testnet.0g.ai",
+  "explorer": "https://chainscan-galileo.0g.ai",
+  "storage": {
+    "indexer": "https://indexer-storage-testnet-turbo.0g.ai",
+    "scan": "https://storagescan-galileo.0g.ai"
+  }
+}

@@ -2,3 +2,23 @@
 __pycache__/
 .env
 .venv/
+.pytest_cache/
+
+# Node
+node_modules/
+package-lock.json
+
+# Hardhat
+contracts/artifacts/
+contracts/cache/
+
+# Simulation results (generated)
+server/results/
+server/live_results/
+
+# Next.js
+dashboard-next/.next/
+dashboard-next/node_modules/
+
+# OS
+.DS_Store
