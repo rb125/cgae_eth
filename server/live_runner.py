@@ -282,6 +282,39 @@ class LiveSimulationRunner:
         )
         self.economy = Economy(config=econ_config)
 
+        # Initialize on-chain components (if credentials available)
+        self._wallet_manager = None
+        self._onchain_bridge = None
+        self._ens_manager = None
+        try:
+            from cgae_engine.wallet import WalletManager
+            wm = WalletManager()
+            if wm.is_live:
+                self._wallet_manager = wm
+                self.economy.wallet_manager = wm
+                logger.info(f"Wallet manager: treasury={wm.treasury_address}")
+        except Exception as e:
+            logger.debug(f"Wallet manager unavailable: {e}")
+
+        try:
+            from cgae_engine.onchain import OnChainBridge
+            bridge = OnChainBridge()
+            if bridge.is_live:
+                self._onchain_bridge = bridge
+                self.economy.onchain_bridge = bridge
+                logger.info("On-chain bridge: connected to CGAERegistry")
+        except Exception as e:
+            logger.debug(f"On-chain bridge unavailable: {e}")
+
+        try:
+            from cgae_engine.ens import ENSManager
+            ens = ENSManager()
+            self._ens_manager = ens
+            self.economy.ens_manager = ens
+            logger.info(f"ENS manager: {ens.parent_name}")
+        except Exception as e:
+            logger.debug(f"ENS manager unavailable: {e}")
+
         # Initialize audit orchestrator pointing at hosted framework APIs
         self.audit = AuditOrchestrator(
             cdct_api_url=self.config.cdct_api_url,

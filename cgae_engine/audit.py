@@ -461,12 +461,16 @@ class AuditOrchestrator:
         )
 
     def _load_cdct_score(self, model_name: str) -> tuple[float, bool]:
-        """Return (cc_score, used_default).  Queries CDCT API for pre-computed score."""
+        """Return (cc_score, used_default). CDCT returns list of per-concept results."""
         default_cc = 0.5
         try:
             data = self._cdct.get_score(model_name)
             cc = self._extract_score(data, "cc", model_name=model_name)
-            if cc is not None:
+            if cc is None and isinstance(data, list) and data:
+                cris = [float(r["CRI"]) for r in data if isinstance(r, dict) and "CRI" in r]
+                if cris:
+                    cc = min(cris)
+            if cc is not None and cc > 0:
                 logger.info(f"  [pre-computed audit] CDCT done for {model_name}: CC={cc:.3f}")
                 return cc, False
         except Exception:
@@ -475,12 +479,16 @@ class AuditOrchestrator:
         return default_cc, True
 
     def _load_ddft_score(self, model_name: str) -> tuple[float, bool]:
-        """Return (er_score, used_default).  Queries DDFT API for pre-computed score."""
+        """Return (er_score, used_default). DDFT returns dict with uppercase keys."""
         default_er = 0.5
         try:
             data = self._ddft.get_score(model_name)
             er = self._extract_score(data, "er", model_name=model_name)
-            if er is not None:
+            if er is None and isinstance(data, dict):
+                er_val = data.get("ER") or data.get("er")
+                if er_val is not None:
+                    er = float(er_val)
+            if er is not None and er > 0:
                 logger.info(f"  [pre-computed audit] DDFT done for {model_name}: ER={er:.3f}")
                 return er, False
         except Exception:
@@ -489,26 +497,34 @@ class AuditOrchestrator:
         return default_er, True
 
     def _load_eect_score(self, model_name: str) -> tuple[float, bool]:
-        """Return (as_score, used_default).  Queries EECT API for pre-computed score."""
+        """Return (as_score, used_default). AGT returns as_score key."""
         default_as = 0.5
         try:
             data = self._eect.get_score(model_name)
             as_ = self._extract_score(data, "as_", model_name=model_name)
-            if as_ is not None:
-                logger.info(f"  [pre-computed audit] EECT done for {model_name}: AS={as_:.3f}")
+            if as_ is None and isinstance(data, dict):
+                val = data.get("as_score") or data.get("AS") or data.get("as")
+                if val is not None:
+                    as_ = float(val)
+            if as_ is not None and as_ > 0:
+                logger.info(f"  [pre-computed audit] AGT done for {model_name}: AS={as_:.3f}")
                 return as_, False
         except Exception:
             pass
-        logger.debug(f"  [pre-computed audit] EECT fallback for {model_name}: AS={default_as:.3f}")
+        logger.debug(f"  [pre-computed audit] AGT fallback for {model_name}: AS={default_as:.3f}")
         return default_as, True
 
     def _load_ih_score(self, model_name: str) -> tuple[float, bool]:
-        """Return (ih_score, used_default).  Queries DDFT API for pre-computed IH score."""
+        """Return (ih_score, used_default). DDFT returns IH in uppercase."""
         default_ih = 0.7
         try:
             data = self._ddft.get_score(model_name)
             ih = self._extract_score(data, "ih", model_name=model_name)
-            if ih is not None:
+            if ih is None and isinstance(data, dict):
+                val = data.get("IH") or data.get("ih")
+                if val is not None:
+                    ih = float(val)
+            if ih is not None and ih > 0:
                 return ih, False
         except Exception:
             pass

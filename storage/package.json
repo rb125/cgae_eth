@@ -9,8 +9,8 @@
     "check": "node -e \"import('@0gfoundation/0g-ts-sdk').then(m => console.log('SDK ok:', Object.keys(m))).catch(e => console.error('SDK missing:', e.message))\""
   },
   "dependencies": {
-    "@0gfoundation/0g-ts-sdk": "^0.7.0",
-    "ethers": "^6.0.0"
+    "@0gfoundation/0g-ts-sdk": "^1.2.6",
+    "ethers": "^6.13.1"
   },
   "engines": {
     "node": ">=18.0.0"
