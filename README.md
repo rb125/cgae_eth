@@ -127,12 +127,6 @@ cd dashboard-next && npm install && npm run dev
 
 Open http://localhost:3000
 
-### Video Demo
-
-```bash
-python scripts/video_demo.py --rounds 5
-```
-
 ### Deploy Smart Contracts
 
 ```bash
@@ -184,7 +178,7 @@ cgae/
 ├── dashboard-next/           # Next.js frontend
 │   └── app/page.tsx
 └── scripts/
-    └── video_demo.py         # Scripted demo for recording
+
 ```
 
 ## Tech Stack
