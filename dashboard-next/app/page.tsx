@@ -17,7 +17,7 @@ const AMBER = "#d97706";
 const TC: Record<number,string> = {0:"#94a3b8",1:"#6366f1",2:"#2563eb",3:"#7c3aed",4:"#d97706",5:"#dc2626"};
 
 interface Economy { aggregate_safety:number; active_agents:number; total_balance:number; total_earned:number; contracts_completed:number; contracts_failed:number }
-interface Agent { agent_id:string; model_name:string; strategy:string; current_tier:number; balance:number; total_earned:number; total_penalties:number; contracts_completed:number; contracts_failed:number; status:string; wallet_address?:string; robustness:{cc:number;er:number;as_:number;ih:number}|null }
+interface Agent { agent_id:string; model_name:string; strategy:string; current_tier:number; balance:number; total_earned:number; total_penalties:number; contracts_completed:number; contracts_failed:number; status:string; wallet_address?:string; ens_name?:string; robustness:{cc:number;er:number;as_:number;ih:number}|null }
 interface Trade { round:number; agent:string; task_id:string; task_prompt:string; tier:string; domain:string; passed:boolean; reward:number; penalty:number; token_cost:number; latency_ms:number; output_preview:string; constraints_passed:string[]; constraints_failed:string[] }
 interface Evt { timestamp:number; type:string; agent:string; message:string }
 
@@ -129,7 +129,7 @@ function AgentsTab({agents}:{agents:Agent[]}){
         </tr></thead>
         <tbody>{s.map(a=>(
           <tr key={a.agent_id} className="border-b border-slate-50 hover:bg-violet-50/30 transition-colors">
-            <td className="px-5 py-3.5"><div className="font-bold text-slate-800">{a.model_name}</div><Addr id={a.wallet_address||a.agent_id}/></td>
+            <td className="px-5 py-3.5"><div className="font-bold text-slate-800">{a.model_name}</div>{a.ens_name&&<a href={`https://sepolia.app.ens.domains/${a.ens_name}`} target="_blank" rel="noopener noreferrer" className="text-violet-500 font-mono text-[10px] hover:underline">{a.ens_name}</a>}{a.wallet_address&&<div><a href={`https://chainscan-galileo.0g.ai/address/${a.wallet_address}`} target="_blank" rel="noopener noreferrer" className="text-slate-400 font-mono text-[10px] hover:text-violet-500 hover:underline">{a.wallet_address.slice(0,6)}…{a.wallet_address.slice(-4)}</a></div>}</td>
             <td className="px-3 py-3.5 text-slate-500 capitalize text-xs font-medium">{a.strategy}</td>
             <td className="px-3 py-3.5 text-center"><TB t={a.current_tier}/></td>
             <td className="px-3 py-3.5 text-right font-mono text-xs text-slate-700">Ξ {a.balance.toFixed(4)}</td>
@@ -179,13 +179,13 @@ function TradesTab({trades}:{trades:Trade[]}){
               <div><p className="text-[10px] text-slate-400 font-semibold mb-0.5">Token Cost</p><p className="font-mono text-slate-700">Ξ {t.token_cost.toFixed(6)}</p></div>
               <div><p className="text-[10px] text-slate-400 font-semibold mb-0.5">Latency</p><p className="text-slate-700">{t.latency_ms.toFixed(0)} ms</p></div>
             </div>
+            {t.task_prompt&&<div><p className="text-[10px] text-slate-400 font-semibold mb-1.5">Task Definition</p><pre className="text-[11px] text-slate-600 bg-white rounded-xl p-3.5 overflow-x-auto max-h-48 whitespace-pre-wrap border border-slate-200 shadow-inner">{t.task_prompt}</pre></div>}
             {(t.constraints_passed.length>0||t.constraints_failed.length>0)&&(
               <div><p className="text-[10px] text-slate-400 font-semibold mb-1.5">Constraints</p>
                 <div className="flex flex-wrap gap-1.5">
                   {t.constraints_passed.map((c,j)=><span key={`p${j}`} className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">✓ {c}</span>)}
                   {t.constraints_failed.map((c,j)=><span key={`f${j}`} className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-red-50 text-red-600 border border-red-200">✗ {c}</span>)}
                 </div></div>)}
-            {t.task_prompt&&<div><p className="text-[10px] text-slate-400 font-semibold mb-1.5">Task Prompt</p><pre className="text-[11px] text-slate-600 bg-white rounded-xl p-3.5 overflow-x-auto max-h-48 whitespace-pre-wrap border border-slate-200 shadow-inner">{t.task_prompt}</pre></div>}
             <div><p className="text-[10px] text-slate-400 font-semibold mb-1.5">Agent Output</p><pre className="text-[11px] text-slate-500 bg-white rounded-xl p-3.5 overflow-x-auto max-h-40 whitespace-pre-wrap border border-slate-200 shadow-inner">{t.output_preview}</pre></div>
           </div>)}
       </Card>);})}

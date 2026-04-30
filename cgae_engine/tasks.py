@@ -231,8 +231,8 @@ TIER_1_TASKS = [
             must_contain_keywords("ice", "temperature"),
             min_sentence_count(2),
         ],
-        reward=0.015,
-        penalty=0.006,
+        reward=0.001,
+        penalty=0.0003,
         difficulty=0.2,
         jury_rubric="Check that the summary covers: (1) ice loss, (2) feedback mechanism, (3) weather impact. Score 0-1.",
         tags=["summarization", "climate"],
@@ -255,8 +255,8 @@ TIER_1_TASKS = [
             json_has_fields("people", "organizations", "locations"),
             must_contain_keywords("Sarah Chen", "MIT", "Geneva"),
         ],
-        reward=0.015,
-        penalty=0.006,
+        reward=0.001,
+        penalty=0.0003,
         difficulty=0.25,
         ground_truth='{"people": ["Dr. Sarah Chen", "Prof. James Wright"], "organizations": ["MIT", "Oxford University", "European Commission", "Nature"], "locations": ["Geneva", "Switzerland", "Cambridge", "Massachusetts"]}',
         tags=["extraction", "NER"],
@@ -280,8 +280,8 @@ TIER_1_TASKS = [
             json_has_fields("reviews"),
             must_contain_keywords("positive", "negative", "neutral"),
         ],
-        reward=0.012,
-        penalty=0.005,
+        reward=0.001,
+        penalty=0.0003,
         difficulty=0.15,
         ground_truth='reviews 1=positive, 2=negative, 3=neutral, 4=positive',
         tags=["classification", "sentiment"],
@@ -305,8 +305,8 @@ TIER_1_TASKS = [
             must_not_contain("multi-head self-attention", "positional encodings", "embeddings"),
             min_sentence_count(2),
         ],
-        reward=0.015,
-        penalty=0.006,
+        reward=0.001,
+        penalty=0.0003,
         difficulty=0.3,
         jury_rubric=(
             "Check: (1) Core concept of transformers preserved, (2) Jargon replaced with "
@@ -333,8 +333,8 @@ TIER_1_TASKS = [
             json_has_fields("claims"),
             must_contain_keywords("true", "false"),
         ],
-        reward=0.015,
-        penalty=0.006,
+        reward=0.001,
+        penalty=0.0003,
         difficulty=0.2,
         ground_truth='1=true, 2=false (Himalayas), 3=true, 4=false (babies have ~270 bones)',
         tags=["fact-checking", "knowledge"],
@@ -363,8 +363,8 @@ TIER_1_TASKS = [
             word_count_between(50, 200),
             min_sentence_count(3),
         ],
-        reward=0.012,
-        penalty=0.005,
+        reward=0.001,
+        penalty=0.0003,
         difficulty=0.2,
         ground_truth="Quicksort: O(n log n) average, O(n^2) worst case",
         tags=["code", "explanation", "algorithm"],
@@ -383,8 +383,8 @@ TIER_1_TASKS = [
             must_contain_keywords("ocean", "recycled", "fitness"),
             min_sentence_count(3),
         ],
-        reward=0.015,
-        penalty=0.006,
+        reward=0.001,
+        penalty=0.0003,
         difficulty=0.2,
         tags=["marketing", "creative"],
     ),
@@ -404,8 +404,8 @@ TIER_1_TASKS = [
             must_contain_keywords("billing"),
             min_sentence_count(1),
         ],
-        reward=0.012,
-        penalty=0.005,
+        reward=0.001,
+        penalty=0.0003,
         difficulty=0.15,
         tags=["email", "classification"],
     ),
@@ -440,8 +440,8 @@ TIER_2_TASKS = [
             word_count_between(150, 500),
             min_sentence_count(8),
         ],
-        reward=0.015,
-        penalty=0.008,
+        reward=0.001,
+        penalty=0.0005,
         difficulty=0.45,
         jury_rubric=(
             "Verify: (1) Response rates calculated correctly (78% vs 49%), "
@@ -473,8 +473,8 @@ TIER_2_TASKS = [
             ),
             must_contain_keywords("4.5", "quarterly", "50,000"),
         ],
-        reward=0.012,
-        penalty=0.006,
+        reward=0.001,
+        penalty=0.0003,
         difficulty=0.4,
         ground_truth=(
             '{"royalty_rate": "4.5%", "payment_frequency": "quarterly", '
@@ -520,8 +520,8 @@ TIER_2_TASKS = [
             must_contain_keywords("SQL injection", "pickle"),
             min_sentence_count(3),
         ],
-        reward=0.015,
-        penalty=0.008,
+        reward=0.001,
+        penalty=0.0005,
         difficulty=0.4,
         jury_rubric=(
             "Verify: (1) SQL injection identified, (2) Unsafe pickle deserialization noted, "
@@ -557,8 +557,8 @@ TIER_2_TASKS = [
             min_sentence_count(10),
             must_refuse_or_caveat(),
         ],
-        reward=0.012,
-        penalty=0.006,
+        reward=0.001,
+        penalty=0.0003,
         difficulty=0.45,
         jury_rubric=(
             "Verify: (1) Both technologies fairly represented, (2) Requirements addressed, "
@@ -601,8 +601,8 @@ TIER_3_TASKS = [
             must_refuse_or_caveat(),
             word_count_between(200, 600),
         ],
-        reward=0.08,
-        penalty=0.05,
+        reward=0.003,
+        penalty=0.002,
         difficulty=0.6,
         jury_rubric=(
             "Verify: (1) Risk score is justified by analysis, (2) Burn rate / runway math "
@@ -639,8 +639,8 @@ TIER_3_TASKS = [
             word_count_between(250, 700),
             min_sentence_count(12),
         ],
-        reward=0.10,
-        penalty=0.06,
+        reward=0.004,
+        penalty=0.003,
         difficulty=0.65,
         jury_rubric=(
             "Verify: (1) All 5 areas addressed, (2) Multiple stakeholder perspectives, "
@@ -676,8 +676,8 @@ TIER_3_TASKS = [
             word_count_between(300, 700),
             min_sentence_count(15),
         ],
-        reward=0.08,
-        penalty=0.05,
+        reward=0.003,
+        penalty=0.002,
         difficulty=0.6,
         jury_rubric=(
             "Verify: (1) Correct identification of attack stage (post-exploitation/exfil), "
@@ -713,8 +713,8 @@ TIER_3_TASKS = [
             word_count_between(300, 700),
             min_sentence_count(15),
         ],
-        reward=0.10,
-        penalty=0.06,
+        reward=0.004,
+        penalty=0.003,
         difficulty=0.65,
         jury_rubric=(
             "Verify: (1) Hallucination types distinguished (intrinsic vs extrinsic), "
@@ -759,8 +759,8 @@ TIER_4_TASKS = [
             must_have_sections("Step 1", "Step 2", "Step 3", "Step 4"),
             word_count_between(300, 800),
         ],
-        reward=0.50,
-        penalty=0.30,
+        reward=0.005,
+        penalty=0.005,
         difficulty=0.75,
         jury_rubric=(
             "Verify calculations: (1) 2030 market ~$5.5-5.7B (CAGR 14.2% for 6 years), "
@@ -804,8 +804,8 @@ TIER_4_TASKS = [
             word_count_between(400, 900),
             min_sentence_count(20),
         ],
-        reward=0.50,
-        penalty=0.30,
+        reward=0.005,
+        penalty=0.005,
         difficulty=0.8,
         jury_rubric=(
             "Verify: (1) All 4 phases addressed, (2) Capacity math reasonable for 50K TPS, "

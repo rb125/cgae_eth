@@ -330,7 +330,7 @@ def _pin_audit_to_0g(
             _sys.path.insert(0, _root)
         from storage.zg_store import ZgStore  # type: ignore
 
-        store = ZgStore()
+        store = ZgStore(fallback_ok=False)
         result = store.store_audit_result(model_name, cert_path)
 
         cert["storage_root_hash"] = result.root_hash
@@ -338,21 +338,15 @@ def _pin_audit_to_0g(
         if cert_path:
             cert_path.write_text(json.dumps(cert, indent=2))
 
-        if result.real:
-            logger.info(
-                f"  [0g] Audit cert pinned: {result.root_hash} (model={model_name})"
-            )
-        else:
-            logger.warning(
-                f"  [0g] Fallback hash for {model_name}: {result.root_hash} "
-                f"(reason: {result.error})"
-            )
+        logger.info(
+            f"  [0g] Audit cert pinned: {result.root_hash} (model={model_name})"
+        )
 
         return result.root_hash, result.real
 
     except Exception as e:
-        logger.warning(f"  [0g] Pin failed for {model_name}: {e}")
-        return None, False
+        logger.error(f"  [0g] Pin failed for {model_name}: {e}")
+        raise RuntimeError(f"0G Storage pin failed for {model_name}: {e}") from e
 
 
 class AuditOrchestrator:
@@ -393,8 +387,8 @@ class AuditOrchestrator:
 
     def audit_from_results(self, agent_id: str, model_name: str) -> AuditResult:
         """
-        Compute robustness vector from pre-computed framework scores.
-        Queries each hosted framework API for stored results for *model_name*.
+        Compute robustness vector by querying framework API endpoints.
+        Calls each hosted framework API's /score endpoint for *model_name*.
 
         ``defaults_used`` on the returned result lists any dimensions where no
         real framework data was found and the 0.5 / 0.7 midpoint was substituted.
@@ -420,7 +414,7 @@ class AuditOrchestrator:
             robustness=robustness,
             details={
                 "cc": cc, "er": er, "as": as_, "ih": ih,
-                "source": "pre-computed",
+                "source": "framework_api",
                 "defaults_used": sorted(defaults_used),
             },
             defaults_used=defaults_used,
@@ -471,11 +465,11 @@ class AuditOrchestrator:
                 if cris:
                     cc = min(cris)
             if cc is not None and cc > 0:
-                logger.info(f"  [pre-computed audit] CDCT done for {model_name}: CC={cc:.3f}")
+                logger.info(f"  [CDCT] GET {self._cdct.base_url}/score/{model_name} -> CC={cc:.3f}")
                 return cc, False
         except Exception:
             pass
-        logger.debug(f"  [pre-computed audit] CDCT fallback for {model_name}: CC={default_cc:.3f}")
+        logger.debug(f"  [CDCT] No score for {model_name}, using default CC={default_cc:.3f}")
         return default_cc, True
 
     def _load_ddft_score(self, model_name: str) -> tuple[float, bool]:
@@ -489,11 +483,11 @@ class AuditOrchestrator:
                 if er_val is not None:
                     er = float(er_val)
             if er is not None and er > 0:
-                logger.info(f"  [pre-computed audit] DDFT done for {model_name}: ER={er:.3f}")
+                logger.info(f"  [DDFT] GET {self._ddft.base_url}/score/{model_name} -> ER={er:.3f}")
                 return er, False
         except Exception:
             pass
-        logger.debug(f"  [pre-computed audit] DDFT fallback for {model_name}: ER={default_er:.3f}")
+        logger.debug(f"  [DDFT] No score for {model_name}, using default ER={default_er:.3f}")
         return default_er, True
 
     def _load_eect_score(self, model_name: str) -> tuple[float, bool]:
@@ -507,11 +501,11 @@ class AuditOrchestrator:
                 if val is not None:
                     as_ = float(val)
             if as_ is not None and as_ > 0:
-                logger.info(f"  [pre-computed audit] AGT done for {model_name}: AS={as_:.3f}")
+                logger.info(f"  [AGT] GET {self._eect.base_url}/score/{model_name} -> AS={as_:.3f}")
                 return as_, False
         except Exception:
             pass
-        logger.debug(f"  [pre-computed audit] AGT fallback for {model_name}: AS={default_as:.3f}")
+        logger.debug(f"  [AGT] No score for {model_name}, using default AS={default_as:.3f}")
         return default_as, True
 
     def _load_ih_score(self, model_name: str) -> tuple[float, bool]:
@@ -528,7 +522,7 @@ class AuditOrchestrator:
                 return ih, False
         except Exception:
             pass
-        logger.debug(f"  [pre-computed audit] DDFT fallback for {model_name}: IH={default_ih:.3f}")
+        logger.debug(f"  [DDFT] No IH score for {model_name}, using default IH={default_ih:.3f}")
         return default_ih, True
 
     @staticmethod

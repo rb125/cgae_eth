@@ -219,8 +219,8 @@ class LiveSimConfig:
     ddft_results_dir: Optional[str] = None
     eect_results_dir: Optional[str] = None
     # Live audit generation (runs CDCT/DDFT/EECT against each contestant)
-    # When True, pre-computed results are still checked first; live run fills
-    # any dimensions that have no pre-computed file.
+    # When True, framework API scores are still checked first; live run fills
+    # any dimensions that have no stored result.
     run_live_audit: bool = True
     live_audit_cache_dir: Optional[str] = None   # defaults to output_dir/audit_cache
     # Agent strategy assignment: model_name -> strategy_name
@@ -307,6 +307,17 @@ class LiveSimulationRunner:
             logger.debug(f"On-chain bridge unavailable: {e}")
 
         try:
+            from cgae_engine.onchain import EscrowBridge
+            escrow = EscrowBridge()
+            if escrow.is_live:
+                self._escrow_bridge = escrow
+                self.economy.escrow_bridge = escrow
+                logger.info("Escrow bridge: connected to CGAEEscrow")
+        except Exception as e:
+            self._escrow_bridge = None
+            logger.debug(f"Escrow bridge unavailable: {e}")
+
+        try:
             from cgae_engine.ens import ENSManager
             ens = ENSManager()
             self._ens_manager = ens
@@ -376,7 +387,7 @@ class LiveSimulationRunner:
         Priority:
           1. Run live audits (CDCT/DDFT/EECT) when ``config.run_live_audit=True``.
              Results are cached to ``live_audit_cache_dir`` so reruns are instant.
-          2. For any dimension where the live run fails, check pre-computed framework
+          2. For any dimension where the live run fails, check framework API
              result directories if they are configured.
           3. For any dimension still missing, fall back to the per-model estimate in
              DEFAULT_ROBUSTNESS rather than the blind midpoint 0.5.
@@ -413,7 +424,7 @@ class LiveSimulationRunner:
                 dims_real      = sorted({"cc", "er", "as", "ih"} - defaulted)
                 dims_defaulted = sorted(defaulted)
 
-                # For any dimension that failed in live audit, try pre-computed
+                # For any dimension that failed in live audit, try framework API
                 if defaulted:
                     pre = self._load_precomputed(model_name, agent_id)
                     if pre:
@@ -431,7 +442,7 @@ class LiveSimulationRunner:
                     cc, er, as_, ih = r.cc, r.er, r.as_, r.ih
 
                 source = "live_audit" if not defaulted else (
-                    "live_partial" if dims_real else "default_robustness"
+                    "live_partial" if dims_real else "live_with_defaults"
                 )
                 logger.info(
                     f"  {model_name}: CC={cc:.3f} ER={er:.3f} AS={as_:.3f} IH={ih:.3f} "
@@ -447,38 +458,31 @@ class LiveSimulationRunner:
 
             except Exception as e:
                 logger.error(
-                    f"  Live audit failed entirely for {model_name}: {e}. "
-                    f"Falling back to pre-computed / defaults."
+                    f"  Live audit failed entirely for {model_name}: {e}."
                 )
+                raise RuntimeError(f"Live audit failed for {model_name}: {e}") from e
 
-        # --- Step 2: Pre-computed framework results (fallback) --------------
+        # --- Step 2: Framework API scores (fallback) -------------------------
         pre = self._load_precomputed(model_name, agent_id)
         if pre is not None:
             self._audit_quality[model_name] = {
-                "source": "pre_computed",
+                "source": "framework_api",
                 "dims_real": ["cc", "er", "as", "ih"],
                 "dims_defaulted": [],
             }
             return pre
 
-        # --- Step 3: DEFAULT_ROBUSTNESS per model (last resort) -------------
-        self._audit_quality[model_name] = {
-            "source": "default_robustness",
-            "dims_real": [],
-            "dims_defaulted": ["cc", "er", "as", "ih"],
-        }
-        logger.warning(
-            f"  {model_name}: No audit data available. Using default robustness "
-            f"CC={fallback.cc:.3f} ER={fallback.er:.3f} "
-            f"AS={fallback.as_:.3f} IH={fallback.ih:.3f}"
+        # --- Step 3: No data available — error ----------------------------
+        raise RuntimeError(
+            f"{model_name}: No audit data available. "
+            f"Ensure CDCT/DDFT/EECT APIs are running."
         )
-        return fallback
 
     def _load_precomputed(
         self, model_name: str, agent_id: str
     ) -> Optional[RobustnessVector]:
         """
-        Attempt to load robustness from pre-computed framework API scores.
+        Query framework API endpoints for stored scores.
         Returns None when no real data is found for any dimension.
         """
         try:
@@ -499,7 +503,7 @@ class LiveSimulationRunner:
                 ih  = fallback.ih   if "ih"  in d else r.ih,
             )
         except Exception as e:
-            logger.debug(f"  Pre-computed load failed for {model_name}: {e}")
+            logger.debug(f"  Framework API query failed for {model_name}: {e}")
             return None
 
     def setup(self):

@@ -116,12 +116,14 @@ class ZgStore:
                 return self._upload_via_0g(model_name, json_path)
             except Exception as e:
                 msg = str(e)
-                logger.warning(f"  [0g] Upload failed for {model_name}: {msg}. Using fallback hash.")
                 if not self.fallback_ok:
-                    raise
+                    raise RuntimeError(f"0G Storage upload failed for {model_name}: {msg}") from e
+                logger.warning(f"  [0g] Upload failed for {model_name}: {msg}. Using fallback hash.")
                 return self._fallback_result(model_name, json_path, error=msg)
         else:
             reason = self._unavailable_reason()
+            if not self.fallback_ok:
+                raise RuntimeError(f"0G Storage unavailable: {reason}")
             logger.info(f"  [0g] Upload unavailable ({reason}). Using deterministic hash for {model_name}.")
             return self._fallback_result(model_name, json_path, error=reason)
 

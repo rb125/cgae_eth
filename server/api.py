@@ -100,6 +100,7 @@ def _run_economy(num_rounds: int, initial_balance: float):
                     "contracts_failed": rec.contracts_failed,
                     "status": rec.status.value,
                     "wallet_address": rec.wallet_address,
+                    "ens_name": runner.economy.ens_manager.get_agent_name(aid) if runner.economy.ens_manager else None,
                     "robustness": {
                         "cc": r.cc, "er": r.er, "as_": r.as_, "ih": r.ih,
                     } if r else None,

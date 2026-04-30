@@ -20,6 +20,11 @@ from cgae_engine.temporal import TemporalDecay, StochasticAuditor, AuditEvent
 from cgae_engine.registry import AgentRegistry, AgentRecord, AgentStatus
 from cgae_engine.contracts import ContractManager, CGAEContract, ContractStatus, Constraint
 
+try:
+    from web3 import Web3
+except ImportError:
+    Web3 = None
+
 logger = logging.getLogger(__name__)
 
 
@@ -78,7 +83,7 @@ class Economy:
     7. Economic accounting and observability
     """
 
-    def __init__(self, config: Optional[EconomyConfig] = None, wallet_manager=None, onchain_bridge=None, ens_manager=None):
+    def __init__(self, config: Optional[EconomyConfig] = None, wallet_manager=None, onchain_bridge=None, ens_manager=None, escrow_bridge=None):
         self.config = config or EconomyConfig()
         self.gate = GateFunction(
             thresholds=self.config.thresholds,
@@ -92,6 +97,7 @@ class Economy:
         self.wallet_manager = wallet_manager  # Optional: real ETH wallet integration
         self.onchain_bridge = onchain_bridge  # Optional: write certs to CGAERegistry on-chain
         self.ens_manager = ens_manager        # Optional: ENS identity for agents
+        self.escrow_bridge = escrow_bridge    # Optional: on-chain escrow settlement
         self.current_time: float = 0.0
         self._snapshots: list[EconomySnapshot] = []
         self._events: list[dict] = []
@@ -420,7 +426,7 @@ class Economy:
         issuer_id: str = "system",
     ) -> CGAEContract:
         """Post a new contract to the marketplace."""
-        return self.contracts.create_contract(
+        contract = self.contracts.create_contract(
             objective=objective,
             constraints=constraints,
             min_tier=min_tier,
@@ -432,6 +438,29 @@ class Economy:
             difficulty=difficulty,
             timestamp=self.current_time,
         )
+
+        # Create contract on-chain via CGAEEscrow
+        if self.escrow_bridge:
+            import hashlib
+            constraints_hash = Web3.keccak(text="|".join(c.name for c in constraints)) if constraints else b'\x00' * 32
+            reward_wei = int(reward * 1e18)
+            penalty_wei = int(penalty * 1e18)
+            deadline_ts = int(time.time()) + int(deadline_offset * 60)
+            result = self.escrow_bridge.create_contract(
+                objective=objective[:200],
+                constraints_hash=constraints_hash,
+                verifier_spec_hash=contract.contract_id,
+                min_tier=min_tier.value,
+                reward_wei=max(reward_wei, 1),
+                penalty_wei=max(penalty_wei, 1),
+                deadline=deadline_ts,
+                domain=domain,
+            )
+            if result:
+                contract._escrow_tx = result[0]
+                contract._escrow_id = result[1]
+
+        return contract
 
     def accept_contract(self, contract_id: str, agent_id: str) -> bool:
         """
@@ -475,12 +504,22 @@ class Economy:
         r_eff = self.decay.effective_robustness(record.current_robustness, dt)
         effective_tier = self.gate.evaluate(r_eff)
 
-        return self.contracts.assign_contract(
+        accepted = self.contracts.assign_contract(
             contract_id=contract_id,
             agent_id=agent_id,
             agent_tier=effective_tier,
             timestamp=self.current_time,
         )
+
+        # Accept on-chain via CGAEEscrow
+        if accepted and self.escrow_bridge:
+            contract = self.contracts._get_contract(contract_id)
+            escrow_id = getattr(contract, '_escrow_id', None)
+            if escrow_id:
+                penalty_wei = int(contract.penalty * 1e18)
+                self.escrow_bridge.accept_contract(escrow_id, max(penalty_wei, 1))
+
+        return accepted
 
     def complete_contract(
         self,
@@ -538,6 +577,18 @@ class Economy:
 
         settlement["failures"] = failures
         settlement["liable_agent_id"] = liability_agent_id or agent_id
+
+        # Settle on-chain via CGAEEscrow
+        if self.escrow_bridge:
+            contract = self.contracts._get_contract(contract_id)
+            escrow_id = getattr(contract, '_escrow_id', None)
+            if escrow_id:
+                if settlement["outcome"] == "success":
+                    tx = self.escrow_bridge.complete_contract(escrow_id)
+                else:
+                    tx = self.escrow_bridge.fail_contract(escrow_id)
+                settlement["escrow_tx"] = tx
+
         self._log("contract_settled", settlement)
         return settlement
 

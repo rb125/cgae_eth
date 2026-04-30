@@ -1,8 +1,9 @@
 """
-CGAE On-Chain Bridge — Writes certifications to CGAERegistry on 0G Chain.
+CGAE On-Chain Bridge — Writes certifications to CGAERegistry and settles
+contracts through CGAEEscrow on 0G Chain.
 
-Calls CGAERegistry.certify() after each audit so the robustness vector
-and 0G Storage root hash are permanently recorded on-chain.
+- CGAERegistry.certify(): robustness vector + 0G Storage root hash on-chain
+- CGAEEscrow: full contract lifecycle (create/accept/complete/fail) on-chain
 """
 
 from __future__ import annotations
@@ -168,3 +169,162 @@ class OnChainBridge:
             logger.info(f"  [onchain] Registered {agent_addr[:10]}… tx={tx_hash.hex()[:16]}…")
         except Exception as e:
             logger.warning(f"  [onchain] Register failed for {agent_addr[:10]}…: {e}")
+
+
+def _load_escrow_abi() -> list:
+    abi_path = _CONTRACTS_DIR / "artifacts" / "src" / "CGAEEscrow.sol" / "CGAEEscrow.json"
+    if not abi_path.exists():
+        raise FileNotFoundError(f"Escrow ABI not found at {abi_path}. Run: cd contracts && npx hardhat compile")
+    return json.loads(abi_path.read_text())["abi"]
+
+
+class EscrowBridge:
+    """
+    Bridges Python-side contract lifecycle to CGAEEscrow on 0G Chain.
+
+    Full on-chain settlement: createContract (payable, escrows reward),
+    acceptContract (payable, agent deposits penalty collateral),
+    completeContract / failContract.
+    """
+
+    def __init__(
+        self,
+        rpc_url: Optional[str] = None,
+        private_key: Optional[str] = None,
+        escrow_address: Optional[str] = None,
+    ):
+        self.rpc_url = rpc_url or os.getenv("ZG_RPC_URL", "https://evmrpc-testnet.0g.ai")
+        self._key = private_key or os.getenv("PRIVATE_KEY")
+        self.w3 = Web3(Web3.HTTPProvider(self.rpc_url))
+
+        if self._key:
+            key = self._key if self._key.startswith("0x") else f"0x{self._key}"
+            self._account = Account.from_key(key)
+        else:
+            self._account = None
+
+        if escrow_address:
+            self._escrow_addr = escrow_address
+        else:
+            self._escrow_addr = os.getenv("CGAE_ESCROW_ADDRESS")
+            if not self._escrow_addr:
+                deployed = _load_deployed()
+                self._escrow_addr = deployed["contracts"]["CGAEEscrow"]["address"]
+
+        abi = _load_escrow_abi()
+        self.escrow = self.w3.eth.contract(
+            address=Web3.to_checksum_address(self._escrow_addr), abi=abi
+        )
+        self._tx_log: list[dict] = []
+
+    @property
+    def is_live(self) -> bool:
+        return self._account is not None
+
+    def _send_tx(self, fn, value_wei: int = 0, gas: int = 500_000) -> Optional[str]:
+        if not self.is_live:
+            return None
+        try:
+            nonce = self.w3.eth.get_transaction_count(self._account.address)
+            tx = fn.build_transaction({
+                "from": self._account.address,
+                "nonce": nonce,
+                "gas": gas,
+                "gasPrice": self.w3.eth.gas_price,
+                "chainId": self.w3.eth.chain_id,
+                "value": value_wei,
+            })
+            signed = self._account.sign_transaction(tx)
+            tx_hash = self.w3.eth.send_raw_transaction(signed.raw_transaction)
+            receipt = self.w3.eth.wait_for_transaction_receipt(tx_hash, timeout=60)
+            status = "confirmed" if receipt["status"] == 1 else "failed"
+            self._tx_log.append({"tx_hash": tx_hash.hex(), "status": status})
+            return tx_hash.hex()
+        except Exception as e:
+            logger.error(f"  [escrow] tx failed: {e}")
+            self._tx_log.append({"error": str(e)})
+            return None
+
+    def create_contract(
+        self,
+        objective: str,
+        constraints_hash: bytes,
+        verifier_spec_hash: str,
+        min_tier: int,
+        reward_wei: int,
+        penalty_wei: int,
+        deadline: int,
+        domain: str,
+    ) -> Optional[tuple[str, bytes]]:
+        """
+        Create a contract on-chain. Sends reward_wei as escrow.
+        Returns (tx_hash, contract_id) or None.
+        """
+        if not self.is_live:
+            logger.info(f"  [escrow] Dry run createContract (no key)")
+            return None
+
+        fn = self.escrow.functions.createContract(
+            objective[:200],
+            constraints_hash,
+            verifier_spec_hash,
+            min_tier,
+            penalty_wei,
+            deadline,
+            domain,
+        )
+        tx_hash = self._send_tx(fn, value_wei=reward_wei)
+        if not tx_hash:
+            return None
+
+        # Extract contract_id from ContractCreated event
+        receipt = self.w3.eth.get_transaction_receipt(tx_hash)
+        logs = self.escrow.events.ContractCreated().process_receipt(receipt)
+        if logs:
+            contract_id = logs[0]["args"]["contractId"]
+            logger.info(f"  [escrow] Created contract tx={tx_hash[:16]}... id={contract_id.hex()[:16]}...")
+            return tx_hash, contract_id
+        logger.info(f"  [escrow] Created contract tx={tx_hash[:16]}...")
+        return tx_hash, None
+
+    def accept_contract(self, contract_id: bytes, penalty_wei: int) -> Optional[str]:
+        """Agent accepts contract, depositing penalty as collateral."""
+        fn = self.escrow.functions.acceptContract(contract_id)
+        tx_hash = self._send_tx(fn, value_wei=penalty_wei)
+        if tx_hash:
+            logger.info(f"  [escrow] Accepted contract tx={tx_hash[:16]}...")
+        return tx_hash
+
+    def complete_contract(self, contract_id: bytes) -> Optional[str]:
+        """Mark contract completed. Releases reward to agent + returns collateral."""
+        fn = self.escrow.functions.completeContract(contract_id)
+        tx_hash = self._send_tx(fn)
+        if tx_hash:
+            logger.info(f"  [escrow] Completed contract tx={tx_hash[:16]}...")
+        return tx_hash
+
+    def fail_contract(self, contract_id: bytes) -> Optional[str]:
+        """Mark contract failed. Penalty forfeited, reward returned to issuer."""
+        fn = self.escrow.functions.failContract(contract_id)
+        tx_hash = self._send_tx(fn)
+        if tx_hash:
+            logger.info(f"  [escrow] Failed contract tx={tx_hash[:16]}...")
+        return tx_hash
+
+    def get_economics_summary(self) -> Optional[dict]:
+        """Read on-chain economics summary."""
+        try:
+            result = self.escrow.functions.getEconomicsSummary().call()
+            return {
+                "total_rewards_paid": result[0],
+                "total_penalties_collected": result[1],
+                "total_escrowed": result[2],
+                "contract_count": result[3],
+            }
+        except Exception as e:
+            logger.error(f"  [escrow] getEconomicsSummary failed: {e}")
+            return None
+
+    @property
+    def tx_log(self) -> list[dict]:
+        return list(self._tx_log)
