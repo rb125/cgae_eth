@@ -161,6 +161,7 @@ class ENSManager:
     def create_subname(self, agent_id: str, model_name: str, owner: str) -> Optional[str]:
         """
         Create a subname like gpt5.cgaeprotocol.eth for an agent.
+        If the subname already exists (has a cgae.tier record), reuse it.
         Returns the full ENS name or None on failure.
         """
         label = _slugify(model_name)
@@ -168,6 +169,13 @@ class ENSManager:
 
         if not self.is_live:
             logger.info(f"  [ens] Dry run: would create {full_name}")
+            self._subnames[agent_id] = full_name
+            return full_name
+
+        # Check if subname already exists by reading a text record
+        existing_tier = self.resolve_text(full_name, "cgae.tier")
+        if existing_tier:
+            logger.info(f"  [ens] Reusing existing {full_name} (tier={existing_tier})")
             self._subnames[agent_id] = full_name
             return full_name
 

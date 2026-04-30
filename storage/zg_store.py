@@ -166,7 +166,22 @@ class ZgStore:
             except (json.JSONDecodeError, KeyError):
                 raise RuntimeError(stderr or f"exit code {proc.returncode}")
 
-        data = json.loads(proc.stdout.strip())
+        stdout = proc.stdout.strip()
+        if not stdout:
+            stderr = proc.stderr.strip()
+            raise RuntimeError(f"0G upload returned empty output. stderr: {stderr}")
+
+        # SDK may print debug lines before the JSON; find the last JSON line
+        json_line = None
+        for line in reversed(stdout.splitlines()):
+            line = line.strip()
+            if line.startswith("{"):
+                json_line = line
+                break
+        if not json_line:
+            raise RuntimeError(f"0G upload returned no JSON. stdout: {stdout[:200]}")
+
+        data = json.loads(json_line)
         if not data.get("ok"):
             raise RuntimeError(data.get("error", "Unknown upload error"))
 

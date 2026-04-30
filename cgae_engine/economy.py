@@ -325,7 +325,7 @@ class Economy:
         # Create an ETH wallet for this agent if wallet manager is available
         wallet_address = None
         if self.wallet_manager:
-            wallet = self.wallet_manager.create_agent_wallet(record.agent_id)
+            wallet = self.wallet_manager.create_agent_wallet(record.agent_id, model_name)
             wallet_address = wallet.address
             record.wallet_address = wallet_address
 
@@ -378,26 +378,38 @@ class Economy:
         # Write certification on-chain if bridge is available
         onchain_tx = None
         if self.onchain_bridge and record.wallet_address:
-            audit_hash = (audit_details or {}).get("storage_root_hash", "")
-            onchain_tx = self.onchain_bridge.certify_agent(
-                agent_address=record.wallet_address,
-                cc=robustness.cc, er=robustness.er,
-                as_=robustness.as_, ih=robustness.ih,
-                audit_type=audit_type,
-                audit_hash=audit_hash or "",
-            )
+            # Skip if already certified at this tier on-chain
+            ens_tier = ""
+            if self.ens_manager:
+                ens_name = self.ens_manager.get_agent_name(agent_id)
+                if ens_name:
+                    ens_tier = self.ens_manager.resolve_text(ens_name, "cgae.tier")
+            if ens_tier != cert.tier.name:
+                audit_hash = (audit_details or {}).get("storage_root_hash", "")
+                onchain_tx = self.onchain_bridge.certify_agent(
+                    agent_address=record.wallet_address,
+                    cc=robustness.cc, er=robustness.er,
+                    as_=robustness.as_, ih=robustness.ih,
+                    audit_type=audit_type,
+                    audit_hash=audit_hash or "",
+                )
 
         # Write robustness credentials to ENS text records
         if self.ens_manager:
-            audit_hash = (audit_details or {}).get("storage_root_hash", "")
-            self.ens_manager.set_agent_credentials(
-                agent_id=agent_id,
-                tier=cert.tier.name,
-                cc=robustness.cc, er=robustness.er,
-                as_=robustness.as_, ih=robustness.ih,
-                wallet_address=record.wallet_address or "",
-                audit_hash=audit_hash,
-            )
+            ens_name = self.ens_manager.get_agent_name(agent_id)
+            existing_tier = self.ens_manager.resolve_text(ens_name, "cgae.tier") if ens_name else ""
+            if existing_tier != cert.tier.name:
+                audit_hash = (audit_details or {}).get("storage_root_hash", "")
+                self.ens_manager.set_agent_credentials(
+                    agent_id=agent_id,
+                    tier=cert.tier.name,
+                    cc=robustness.cc, er=robustness.er,
+                    as_=robustness.as_, ih=robustness.ih,
+                    wallet_address=record.wallet_address or "",
+                    audit_hash=audit_hash,
+                )
+            else:
+                logger.info(f"  [ens] Skipping text record update for {ens_name} (tier unchanged: {existing_tier})")
 
         self._log("agent_audited", {
             "agent_id": agent_id,

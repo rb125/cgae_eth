@@ -94,7 +94,8 @@ async function main() {
   try {
     const [hash, uploadErr] = await indexer.upload(file, RPC_URL, signer);
     if (uploadErr) throw new Error(String(uploadErr));
-    rootHash = hash;
+    // SDK may return a string or an object {rootHash, txHash, txSeq}
+    rootHash = (typeof hash === "object" && hash !== null) ? hash.rootHash : hash;
   } catch (e) {
     writeError(`Upload failed: ${e.message}`);
     process.exit(1);

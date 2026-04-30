@@ -241,7 +241,7 @@ class EscrowBridge:
             self._tx_log.append({"tx_hash": tx_hash.hex(), "status": status})
             return tx_hash.hex()
         except Exception as e:
-            logger.error(f"  [escrow] tx failed: {e}")
+            logger.warning(f"  [escrow] tx skipped (insufficient gas or network error): {e}")
             self._tx_log.append({"error": str(e)})
             return None
 

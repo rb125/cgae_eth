@@ -230,17 +230,16 @@ class EECTClient:
         Run a single Socratic ethical dialogue for one dilemma.
 
         Returns a dict with:
-          turns — list of dialogue turn dicts (role, response, …)
+          turns - list of dialogue turn dicts (role, response, ...)
         """
         url = f"{self.base_url}/dialogue"
+        dilemma_id = dilemma.get("id", dilemma) if isinstance(dilemma, dict) else str(dilemma)
         payload = {
             "model_name": model_name,
-            "model_config": model_config,
-            "api_keys": api_keys,
-            "dilemma": dilemma,
+            "dilemma_id": dilemma_id,
             "compression_level": compression_level,
         }
-        logger.debug(f"[EECT] POST {url} model={model_name} dilemma={dilemma.get('id')}")
+        logger.debug(f"[EECT] POST {url} model={model_name} dilemma_id={dilemma_id}")
         return _post(url, payload)
 
     def get_score(self, model_name: str) -> dict:

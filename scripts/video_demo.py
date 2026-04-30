@@ -44,7 +44,7 @@ def section(title: str):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--rounds", type=int, default=5)
+    parser.add_argument("--rounds", type=int, default=2)
     parser.add_argument("--port", type=int, default=8000)
     parser.add_argument("--skip-audit", action="store_true")
     args = parser.parse_args()
@@ -107,15 +107,26 @@ def main():
 
     runner.setup()
 
-    # Certify agents on-chain with their audit scores
+    # Print audit summary with highlights
+    print()
     for agent_id, model_name in runner.agent_model_map.items():
         record = runner.economy.registry.get_agent(agent_id)
-        if record and record.current_robustness:
-            r = record.current_robustness
-            wallet = record.wallet_address
-            audit_hash = record.audit_cid or ""
-            if wallet and chain.is_live:
-                chain.certify_agent(wallet, r.cc, r.er, r.as_, r.ih, "registration", audit_hash)
+        if not record:
+            continue
+        r = record.current_robustness
+        wallet = record.wallet_address or "n/a"
+        ens = runner.economy.ens_manager.get_agent_name(agent_id) if runner.economy.ens_manager else "n/a"
+        cid = record.audit_cid or "n/a"
+        tier = record.current_tier.name
+        print(f"    \033[1;32m\u2713\033[0m \033[1m{model_name}\033[0m")
+        print(f"      Wallet:  {wallet}")
+        print(f"      ENS:     {ens}")
+        if r:
+            print(f"      Scores:  CC={r.cc:.3f}  ER={r.er:.3f}  AS={r.as_:.3f}  IH={r.ih:.3f}  \033[1;33m-> {tier}\033[0m")
+        if cid != "n/a":
+            print(f"      0G Hash: {cid[:32]}...")
+        print()
+        time.sleep(0.5)
 
     time.sleep(2)
 
@@ -169,39 +180,87 @@ def main():
     runner._emit_protocol_event = patched_emit
 
     # ---------------------------------------------------------------------------
-    # Per-round scripted narrative:
-    #   R1 - Baseline trading + grok circumvention blocked
-    #   R2 - Delegation: grok delegates to DeepSeek (chain robustness)
-    #   R3 - GPT-5.4 invests in robustness -> upgrade to T3
-    #   R4 - Spot audit: temporal decay demotes grok + spoof blocked
-    #   R5 - Post-upgrade: GPT-5.4 earns more at T3, economy stabilises
+    # Per-round scripted narrative (2 rounds, all scenarios covered):
+    #   R1 - Circumvention blocked + delegation blocked + normal trading
+    #   R2 - GPT-5.4 upgrade + grok demotion (spot audit) + normal trading
     # ---------------------------------------------------------------------------
 
     # Disable random circumvention/delegation - we script them per round
     runner.config.circumvention_rate = 0.0
     runner.config.delegation_rate = 0.0
 
+    def _push_api_state(round_num):
+        """Push current state to the dashboard API after each task."""
+        safety = runner.economy.aggregate_safety()
+        agents_snap = {}
+        for aid, mname in runner.agent_model_map.items():
+            rec = runner.economy.registry.get_agent(aid)
+            if not rec:
+                continue
+            rv = rec.current_robustness
+            agents_snap[aid] = {
+                "agent_id": aid, "model_name": mname,
+                "strategy": _strat(runner, mname),
+                "current_tier": rec.current_tier.value,
+                "balance": rec.balance, "total_earned": rec.total_earned,
+                "total_penalties": rec.total_penalties,
+                "contracts_completed": rec.contracts_completed,
+                "contracts_failed": rec.contracts_failed,
+                "status": rec.status.value,
+                "wallet_address": rec.wallet_address,
+                "ens_name": runner.economy.ens_manager.get_agent_name(aid) if runner.economy.ens_manager else None,
+                "robustness": {"cc":rv.cc,"er":rv.er,"as_":rv.as_,"ih":rv.ih} if rv else None,
+            }
+        trades = [{
+            "round": tr.get("_round", round_num), "agent": tr["agent"],
+            "task_id": tr["task_id"], "task_prompt": tr.get("task_prompt", ""),
+            "tier": tr["tier"], "domain": tr["domain"],
+            "passed": tr["verification"]["overall_pass"],
+            "reward": tr["settlement"].get("reward", 0) if tr["settlement"] else 0,
+            "penalty": tr["settlement"].get("penalty", 0) if tr["settlement"] else 0,
+            "token_cost": tr.get("token_cost_eth", 0),
+            "latency_ms": tr.get("latency_ms", 0),
+            "output_preview": tr.get("output_preview", ""),
+            "constraints_passed": tr["verification"].get("constraints_passed", []),
+            "constraints_failed": tr["verification"].get("constraints_failed", []),
+        } for tr in runner._results]
+
+        with api._state_lock:
+            api._state["round"] = round_num + 1
+            api._state["economy"] = {
+                "aggregate_safety": safety,
+                "active_agents": len(runner.economy.registry.active_agents),
+                "total_balance": sum(a["balance"] for a in agents_snap.values()),
+                "total_earned": sum(a["total_earned"] for a in agents_snap.values()),
+                "contracts_completed": sum(a["contracts_completed"] for a in agents_snap.values()),
+                "contracts_failed": sum(a["contracts_failed"] for a in agents_snap.values()),
+            }
+            api._state["agents"] = agents_snap
+            api._state["trades"] = trades[-500:]
+
+    # Replace runner._results with a live-updating list
+    _current_round = [0]
+    class _LiveResults(list):
+        def append(self, item):
+            item["_round"] = _current_round[0]
+            super().append(item)
+            _push_api_state(_current_round[0])
+    runner._results = _LiveResults(runner._results)
+
     for round_num in range(args.rounds):
+        _current_round[0] = round_num
         runner._reactivate_suspended_agents()
 
         # ---- Round-specific scripted events ----
         if round_num == 0:
-            # R1: force one circumvention attempt from grok
+            # R1: circumvention + delegation (both blocked for adversarial)
             runner.config.circumvention_rate = 1.0
-            runner.config.delegation_rate = 0.0
-        elif round_num == 1:
-            # R2: force delegation, no circumvention
-            runner.config.circumvention_rate = 0.0
             runner.config.delegation_rate = 1.0
-        elif round_num == 2:
-            # R3: normal trading, then forced upgrade after
+        elif round_num == 1:
+            # R2: spot audit demotion for grok, then upgrade for GPT-5.4
             runner.config.circumvention_rate = 0.0
             runner.config.delegation_rate = 0.0
-        elif round_num == 3:
-            # R4: grok spoof attempt + spot audit demotion
-            runner.config.circumvention_rate = 1.0
-            runner.config.delegation_rate = 0.0
-            # Force temporal decay to trigger a demotion on grok
+            # Force temporal decay demotion on grok
             grok_id = next((aid for aid, m in runner.agent_model_map.items() if m == "grok-4-20-reasoning"), None)
             if grok_id:
                 rec = runner.economy.registry.get_agent(grok_id)
@@ -226,17 +285,13 @@ def main():
                             f"grok-4-20-reasoning demoted {old_tier.name} -> {new_tier.name} after spot audit (temporal decay).",
                             old_tier=old_tier.name, new_tier=new_tier.name,
                         )
-        elif round_num == 4:
-            # R5: clean round, no adversarial - show stable economy
-            runner.config.circumvention_rate = 0.0
-            runner.config.delegation_rate = 0.0
 
         round_results = runner._run_round(round_num)
         runner._round_summaries.append(round_results)
         runner.economy.step()
 
-        # R3 post-round: forced upgrade for GPT-5.4
-        if round_num == 2:
+        # R2 post-round: forced upgrade for GPT-5.4
+        if round_num == 1:
             gpt_id = next((aid for aid, m in runner.agent_model_map.items() if m == "gpt-5.4"), None)
             if gpt_id:
                 rec = runner.economy.registry.get_agent(gpt_id)
@@ -263,53 +318,10 @@ def main():
                             old_tier=old_tier.name, new_tier=new_tier.name,
                         )
 
-        # Push state to API
-        safety = runner.economy.aggregate_safety()
-        agents_snap = {}
-        for aid, mname in runner.agent_model_map.items():
-            rec = runner.economy.registry.get_agent(aid)
-            if not rec:
-                continue
-            rv = rec.current_robustness
-            agents_snap[aid] = {
-                "agent_id": aid, "model_name": mname,
-                "strategy": _strat(runner, mname),
-                "current_tier": rec.current_tier.value,
-                "balance": rec.balance, "total_earned": rec.total_earned,
-                "total_penalties": rec.total_penalties,
-                "contracts_completed": rec.contracts_completed,
-                "contracts_failed": rec.contracts_failed,
-                "status": rec.status.value,
-                "wallet_address": rec.wallet_address,
-                "ens_name": runner.economy.ens_manager.get_agent_name(aid) if runner.economy.ens_manager else None,
-                "robustness": {"cc":rv.cc,"er":rv.er,"as_":rv.as_,"ih":rv.ih} if rv else None,
-            }
-        trades = [{
-            "round": round_num, "agent": tr["agent"],
-            "task_id": tr["task_id"], "task_prompt": tr.get("task_prompt", ""),
-            "tier": tr["tier"], "domain": tr["domain"],
-            "passed": tr["verification"]["overall_pass"],
-            "reward": tr["settlement"].get("reward", 0) if tr["settlement"] else 0,
-            "penalty": tr["settlement"].get("penalty", 0) if tr["settlement"] else 0,
-            "token_cost": tr.get("token_cost_eth", 0),
-            "latency_ms": tr.get("latency_ms", 0),
-            "output_preview": tr.get("output_preview", ""),
-            "constraints_passed": tr["verification"].get("constraints_passed", []),
-            "constraints_failed": tr["verification"].get("constraints_failed", []),
-        } for tr in round_results.get("task_results", [])]
-
+        # Final push + time series update for this round
+        _push_api_state(round_num)
         with api._state_lock:
-            api._state["round"] = round_num + 1
-            api._state["economy"] = {
-                "aggregate_safety": safety,
-                "active_agents": len(runner.economy.registry.active_agents),
-                "total_balance": sum(a["balance"] for a in agents_snap.values()),
-                "total_earned": sum(a["total_earned"] for a in agents_snap.values()),
-                "contracts_completed": sum(a["contracts_completed"] for a in agents_snap.values()),
-                "contracts_failed": sum(a["contracts_failed"] for a in agents_snap.values()),
-            }
-            api._state["agents"] = agents_snap
-            api._state["trades"] = (api._state["trades"] + trades)[-500:]
+            safety = runner.economy.aggregate_safety()
             api._state["time_series"]["safety"].append(safety)
             api._state["time_series"]["balance"].append(api._state["economy"]["total_balance"])
             api._state["time_series"]["rewards"].append(round_results.get("total_reward", 0))
@@ -322,11 +334,8 @@ def main():
         reward = round_results["total_reward"]
         penalty = round_results["total_penalty"]
         themes = {
-            0: "Baseline + Circumvention",
-            1: "Delegation Chain",
-            2: "Robustness Investment -> Upgrade",
-            3: "Spot Audit + Demotion",
-            4: "Stable Economy",
+            0: "Circumvention + Delegation Blocked",
+            1: "Upgrade + Demotion",
         }
         theme = themes.get(round_num, "")
         label = f" Round {round_num+1}/{args.rounds} "
@@ -454,7 +463,7 @@ if __name__ == "__main__":
     import server.api as api
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("--rounds", type=int, default=5)
+    parser.add_argument("--rounds", type=int, default=2)
     parser.add_argument("--port", type=int, default=8000)
     parser.add_argument("--skip-audit", action="store_true")
     args_pre = parser.parse_known_args()[0]

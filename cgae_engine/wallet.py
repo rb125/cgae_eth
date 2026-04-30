@@ -57,6 +57,7 @@ class WalletManager:
         rpc_url: Optional[str] = None,
         treasury_private_key: Optional[str] = None,
         dry_run: bool = False,
+        wallet_store_path: Optional[str] = None,
     ):
         self.rpc_url = rpc_url or os.getenv("ZG_RPC_URL", "https://evmrpc-testnet.0g.ai")
         self._treasury_key = treasury_private_key or os.getenv("PRIVATE_KEY")
@@ -65,6 +66,7 @@ class WalletManager:
         self.w3 = Web3(Web3.HTTPProvider(self.rpc_url))
         self._wallets: dict[str, AgentWallet] = {}  # agent_id -> wallet
         self._disbursements: list[dict] = []
+        self._store_path = Path(wallet_store_path) if wallet_store_path else Path("server/live_results/wallets.json")
 
         if self._treasury_key:
             key = self._treasury_key if self._treasury_key.startswith("0x") else f"0x{self._treasury_key}"
@@ -74,15 +76,30 @@ class WalletManager:
             self._treasury_account = None
             self.treasury_address = None
 
+        # Load persisted wallets from disk
+        self._model_wallets: dict[str, AgentWallet] = {}  # model_name -> wallet
+        self._load_wallets()
+
     @property
     def is_live(self) -> bool:
         """True if we can send real transactions."""
         return self._treasury_account is not None and not self.dry_run
 
-    def create_agent_wallet(self, agent_id: str) -> AgentWallet:
-        """Generate a new ETH keypair for an agent."""
+    def create_agent_wallet(self, agent_id: str, model_name: str = "") -> AgentWallet:
+        """Get existing wallet for this model or generate a new keypair."""
         if agent_id in self._wallets:
             return self._wallets[agent_id]
+
+        # Reuse persisted wallet for this model if it exists
+        if model_name and model_name in self._model_wallets:
+            wallet = AgentWallet(
+                agent_id=agent_id,
+                address=self._model_wallets[model_name].address,
+                private_key=self._model_wallets[model_name].private_key,
+            )
+            self._wallets[agent_id] = wallet
+            logger.info(f"  [wallet] Loaded existing wallet for {agent_id}: {wallet.address}")
+            return wallet
 
         acct = Account.create()
         wallet = AgentWallet(
@@ -91,8 +108,35 @@ class WalletManager:
             private_key=acct.key.hex() if isinstance(acct.key, bytes) else acct.key,
         )
         self._wallets[agent_id] = wallet
+        if model_name:
+            self._model_wallets[model_name] = wallet
+            self._save_wallets()
         logger.info(f"  [wallet] Created wallet for {agent_id}: {wallet.address}")
         return wallet
+
+    def _load_wallets(self):
+        """Load persisted model->wallet mapping from disk."""
+        if self._store_path.exists():
+            try:
+                data = json.loads(self._store_path.read_text())
+                for model_name, w in data.items():
+                    self._model_wallets[model_name] = AgentWallet(
+                        agent_id=w.get("agent_id", ""),
+                        address=w["address"],
+                        private_key=w["private_key"],
+                    )
+                logger.info(f"  [wallet] Loaded {len(self._model_wallets)} persisted wallets")
+            except Exception as e:
+                logger.warning(f"  [wallet] Could not load wallets: {e}")
+
+    def _save_wallets(self):
+        """Persist model->wallet mapping to disk (unredacted keys)."""
+        self._store_path.parent.mkdir(parents=True, exist_ok=True)
+        data = {
+            model: {"agent_id": w.agent_id, "address": w.address, "private_key": w.private_key}
+            for model, w in self._model_wallets.items()
+        }
+        self._store_path.write_text(json.dumps(data, indent=2))
 
     def get_wallet(self, agent_id: str) -> Optional[AgentWallet]:
         return self._wallets.get(agent_id)

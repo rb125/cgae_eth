@@ -1248,6 +1248,7 @@ class LiveSimulationRunner:
                 "executed_by_agent_id": execution_agent_id,
                 "executed_by_model": execution_model_name,
                 "task_id": task.task_id,
+                "task_prompt": task.prompt,
                 "tier": task.tier.name,
                 "domain": task.domain,
                 "proof_cid": cid,

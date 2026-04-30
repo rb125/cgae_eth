@@ -656,14 +656,18 @@ class AuditOrchestrator:
         storage_root_hash: Optional[str] = None
         storage_root_hash_real: bool = False
         if cache_dir:
-            storage_root_hash, storage_root_hash_real = _pin_audit_to_0g(
-                model_name=model_name,
-                agent_id=agent_id,
-                cache_dir=Path(cache_dir) if cache_dir else None,
-                robustness=robustness,
-                defaults_used=defaults_used,
-                errors=errors,
-            )
+            try:
+                storage_root_hash, storage_root_hash_real = _pin_audit_to_0g(
+                    model_name=model_name,
+                    agent_id=agent_id,
+                    cache_dir=Path(cache_dir) if cache_dir else None,
+                    robustness=robustness,
+                    defaults_used=defaults_used,
+                    errors=errors,
+                )
+            except Exception as e:
+                logger.error(f"  [0g] Storage pin failed for {model_name}: {e}")
+                errors.append(f"0G_STORAGE: {e}")
 
         return AuditResult(
             agent_id=agent_id,
@@ -689,139 +693,45 @@ class AuditOrchestrator:
     def _run_ddft_live(
         self, model_name: str, model_config: dict, cache_dir: Optional[Path]
     ) -> tuple[float, float]:
-        """
-        Run DDFT assessment via the hosted DDFT API service.
-        Returns (er_score, ih_score).
-        Cache file: cache_dir/<model_name>_ddft_live.json
-        """
-        if cache_dir:
-            cached = cache_dir / f"{model_name}_ddft_live.json"
-            if cached.exists():
-                data = json.loads(cached.read_text())
-                return data["er"], data["ih"]
-
-        api_keys = {
-            "AZURE_API_KEY": self.azure_api_key,
-            "AZURE_OPENAI_API_ENDPOINT": self.azure_openai_endpoint,
-            "DDFT_MODELS_ENDPOINT": self.ddft_models_endpoint,
-            "AZURE_ANTHROPIC_API_ENDPOINT": self.azure_anthropic_api_endpoint,
-        }
-
-        result = self._ddft.assess(
-            model_name=model_name,
-            model_config=model_config,
-            api_keys=api_keys,
-            concepts=["Natural Selection", "Recursion"],
-            compression_levels=[0.0, 0.5, 1.0],
-        )
-
-        er = float(result.get("er", 0.5))
-        ih = float(result.get("ih", 0.7))
-
-        if cache_dir:
-            cache_dir.mkdir(parents=True, exist_ok=True)
-            (cache_dir / f"{model_name}_ddft_live.json").write_text(
-                json.dumps({"er": er, "ih": ih,
-                            "ci_score": result.get("ci_score"),
-                            "phenotype": result.get("phenotype")}, indent=2)
-            )
+        """Query DDFT /score endpoint. Returns (er, ih)."""
+        data = self._ddft.get_score(model_name)
+        er = float(data.get("ER") or data.get("er") or 0)
+        ih = float(data.get("IH") or data.get("ih") or 0)
+        if er <= 0 or ih <= 0:
+            raise RuntimeError(f"DDFT /score returned no valid ER/IH for {model_name}: {data}")
+        logger.info(f"  [DDFT] GET {self._ddft.base_url}/score/{model_name} -> ER={er:.3f} IH={ih:.3f}")
         return er, ih
 
     def _run_cdct_live(
         self, model_name: str, llm_agent: Any, cache_dir: Optional[Path]
     ) -> float:
-        """
-        Run CDCT experiment via the hosted CDCT API service.
-        Returns cc_score.
-        Cache file: cache_dir/<model_name>_cdct_live.json
-        """
-        if cache_dir:
-            cached = cache_dir / f"{model_name}_cdct_live.json"
-            if cached.exists():
-                data = json.loads(cached.read_text())
-                return data["cc"]
-
-        api_keys = {
-            "AZURE_API_KEY": self.azure_api_key,
-            "AZURE_OPENAI_API_ENDPOINT": self.azure_openai_endpoint,
-            "DDFT_MODELS_ENDPOINT": self.ddft_models_endpoint,
-            "AZURE_ANTHROPIC_API_ENDPOINT": self.azure_anthropic_api_endpoint,
-        }
-
-        model_config = getattr(llm_agent, "model_config", {})
-
-        result = self._cdct.run_experiment(
-            model_name=model_name,
-            model_config=model_config,
-            api_keys=api_keys,
-            concept="logic_modus_ponens",
-            prompt_strategy="compression_aware",
-            evaluation_mode="balanced",
-        )
-
-        cc = float(result.get("cc", 0.5))
-
-        if cache_dir:
-            cache_dir.mkdir(parents=True, exist_ok=True)
-            (cache_dir / f"{model_name}_cdct_live.json").write_text(
-                json.dumps({"cc": cc, "model": model_name}, indent=2)
-            )
+        """Query CDCT /score endpoint. Returns cc. CDCT returns a list of per-concept metrics."""
+        data = self._cdct.get_score(model_name)
+        cc = None
+        if isinstance(data, list) and data:
+            cris = [float(r["CRI"]) for r in data if isinstance(r, dict) and "CRI" in r]
+            if cris:
+                cc = min(cris)
+        elif isinstance(data, dict):
+            cc = self._extract_score(data, "cc", model_name=model_name)
+        if cc is None or cc <= 0:
+            raise RuntimeError(f"CDCT /score returned no valid CC for {model_name}: {data}")
+        logger.info(f"  [CDCT] GET {self._cdct.base_url}/score/{model_name} -> CC={cc:.3f}")
         return cc
 
     def _run_eect_live(
         self, model_name: str, llm_agent: Any, cache_dir: Optional[Path]
     ) -> float:
-        """
-        Run EECT Socratic dialogues via the hosted EECT API service.
-        Returns as_score.
-        Cache file: cache_dir/<model_name>_eect_live.json
-        """
-        if cache_dir:
-            cached = cache_dir / f"{model_name}_eect_live.json"
-            if cached.exists():
-                data = json.loads(cached.read_text())
-                return data["as"]
-
-        api_keys = {
-            "AZURE_API_KEY": self.azure_api_key,
-            "AZURE_OPENAI_API_ENDPOINT": self.azure_openai_endpoint,
-            "DDFT_MODELS_ENDPOINT": self.ddft_models_endpoint,
-            "AZURE_ANTHROPIC_API_ENDPOINT": self.azure_anthropic_api_endpoint,
-        }
-
-        model_config = getattr(llm_agent, "model_config", {})
-
-        # Run two dilemmas and average the AS scores
-        dilemma_ids = ["trolley_problem", "lying_to_save_lives"]
-        all_turns: list[list] = []
-        for dilemma_id in dilemma_ids:
-            try:
-                resp = self._eect.run_dialogue(
-                    model_name=model_name,
-                    model_config=model_config,
-                    api_keys=api_keys,
-                    dilemma={"id": dilemma_id},
-                    compression_level="c1.0",
-                )
-                turns = resp.get("turns", [])
-                if turns:
-                    all_turns.append(turns)
-            except Exception as e:
-                logger.warning(f"  EECT dialogue failed for dilemma {dilemma_id}: {e}")
-
-        if not all_turns:
-            raise RuntimeError("No EECT dialogues completed successfully")
-
-        as_scores = [self._score_eect_turns(turns) for turns in all_turns]
-        as_ = sum(as_scores) / len(as_scores)
-
-        if cache_dir:
-            cache_dir.mkdir(parents=True, exist_ok=True)
-            (cache_dir / f"{model_name}_eect_live.json").write_text(
-                json.dumps({"as": as_, "model": model_name,
-                            "dialogues_run": len(all_turns)}, indent=2)
-            )
-        return as_
+        """Query AGT/EECT /score endpoint. Returns as_score."""
+        data = self._eect.get_score(model_name)
+        as_ = None
+        if isinstance(data, dict):
+            as_ = data.get("as_") or data.get("as_score") or data.get("AS") or data.get("as")
+        if as_ is not None and float(as_) > 0:
+            as_ = float(as_)
+            logger.info(f"  [AGT] GET {self._eect.base_url}/score/{model_name} -> AS={as_:.3f}")
+            return as_
+        raise RuntimeError(f"AGT /score returned no valid AS for {model_name}: {data}")
 
     @staticmethod
     def _score_eect_turns(turns: list) -> float:
