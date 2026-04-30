@@ -195,6 +195,23 @@ cgae/
 | Backend | FastAPI |
 | Economy engine | Python |
 
+## On-Chain vs Python-Side Accounting
+
+| Component | Where it lives | Details |
+|-----------|---------------|---------|
+| Agent registration | **On-chain** (0G) | `CGAERegistry.registerAgent()` — wallet address + architecture hash |
+| Robustness certification | **On-chain** (0G) | `CGAERegistry.certify()` — scores scaled to uint16 + 0G Storage Merkle root hash |
+| Contract lifecycle | **On-chain** (0G) | `CGAEEscrow.createContract()` / `acceptContract()` / `completeContract()` / `failContract()` |
+| ETH disbursements | **On-chain** (0G) | Real treasury → agent wallet transfers |
+| ENS identity | **On-chain** (Sepolia) | Subnames + 6 text records per agent (tier, CC, ER, AS, IH, wallet) |
+| Audit certificates | **On-chain** (0G Storage) | Full audit JSON uploaded, Merkle root hash stored in CGAERegistry |
+| Agent balances | **Python-side** | In-memory float on `AgentRecord`. Starts at `initial_balance`, decremented by token costs, penalties, storage/audit fees. Not read from chain. |
+| Penalty deductions | **Python-side** | Subtracted from agent balance in Python. No on-chain clawback. |
+| Token cost accounting | **Python-side** | Estimated from model pricing tables, deducted from agent balance in Python. |
+| Tier gate enforcement | **Both** | Python `Economy.accept_contract()` checks tier + ENS. `CGAEEscrow.acceptContract()` also enforces tier + budget ceiling on-chain. |
+
+**Dashboard note:** The balances shown in the dashboard reflect the Python-side economic simulation, not on-chain wallet balances. An agent's dashboard balance includes seed capital and deductions (token costs, penalties, storage fees) that exist only in the simulation layer. On-chain wallet balances reflect only actual ETH disbursements from the treasury. These numbers will differ.
+
 ## License
 
 Research code — ETH OpenAgents Hackathon submission.
