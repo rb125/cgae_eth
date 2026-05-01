@@ -88,6 +88,7 @@ def _run_economy(num_rounds: int, initial_balance: float):
         while infinite or round_num < num_rounds:
             runner._reactivate_suspended_agents()
             round_results = runner._run_round(round_num)
+            print(f"[CGAE] Round {round_num}: attempted={round_results['tasks_attempted']} passed={round_results['tasks_passed']} failed={round_results['tasks_failed']}", flush=True)
             runner._round_summaries.append(round_results)
             step_events = runner.economy.step()
 
@@ -228,7 +229,7 @@ def start_economy(rounds: int = 20, balance: float = 0.5):
 @app.on_event("startup")
 async def on_startup():
     import sys
-    rounds = 20
+    rounds = -1
     for i, arg in enumerate(sys.argv):
         if arg == "--rounds" and i + 1 < len(sys.argv):
             rounds = int(sys.argv[i + 1])
