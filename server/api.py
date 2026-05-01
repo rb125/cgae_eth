@@ -18,6 +18,8 @@ from pathlib import Path
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 
 app = FastAPI(title="CGAE Live Economy")
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
@@ -220,6 +222,15 @@ async def on_startup():
         if arg == "--rounds" and i + 1 < len(sys.argv):
             rounds = int(sys.argv[i + 1])
     start_economy(rounds=rounds)
+
+
+# Serve Next.js static export if available (for HF Spaces / single-container deploy)
+_frontend_dir = Path(__file__).resolve().parent.parent / "dashboard-next" / "out"
+if _frontend_dir.exists():
+    @app.get("/")
+    async def serve_index():
+        return FileResponse(str(_frontend_dir / "index.html"))
+    app.mount("/", StaticFiles(directory=str(_frontend_dir), html=True), name="frontend")
 
 
 if __name__ == "__main__":

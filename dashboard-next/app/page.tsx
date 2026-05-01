@@ -6,7 +6,7 @@ import {
   ResponsiveContainer, CartesianGrid, Cell, PieChart, Pie,
 } from "recharts";
 
-const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+const API = process.env.NEXT_PUBLIC_API_URL || "";
 const POLL_MS = 2000;
 
 const VIOLET = "#7c3aed";

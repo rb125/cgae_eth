@@ -39,7 +39,7 @@ def section(title: str):
     print(f"\n{'='*60}")
     print(f"  {title}")
     print(f"{'='*60}\n")
-    time.sleep(0.5)
+    time.sleep(0.2)
 
 
 def main():
@@ -91,9 +91,9 @@ def main():
     print("  Registering 5 AI agents with different economic strategies:\n")
     for model, strat in AGENTS.items():
         print(f"    {model:45s} -> {strat}")
-        time.sleep(1.0)
+        time.sleep(0.3)
     print()
-    time.sleep(2)
+    time.sleep(0.2)
 
     with api._state_lock:
         api._state["status"] = "setup"
@@ -103,7 +103,7 @@ def main():
     section("Step 2: Live Robustness Audits")
     print("  Querying CDCT, DDFT, and AGT framework APIs for each model...")
     print("  This produces verified CC, ER, AS, IH scores.\n")
-    time.sleep(4)
+    time.sleep(1)
 
     runner.setup()
 
@@ -126,9 +126,9 @@ def main():
         if cid != "n/a":
             print(f"      0G Hash: {cid[:32]}...")
         print()
-        time.sleep(0.5)
+        time.sleep(0.2)
 
-    time.sleep(2)
+    time.sleep(0.2)
 
     # ---- Step 3: Gate Assignment ----
     section("Step 3: Weakest-Link Gate -> Tier Assignment")
@@ -155,7 +155,7 @@ def main():
         print(fmt.format(*row))
     print(sep)
     print()
-    time.sleep(12)
+    time.sleep(1)
 
     # ---- Step 4: Economy Rounds ----
     section(f"Step 4: Running {args.rounds} Economy Rounds")
@@ -361,7 +361,7 @@ def main():
                          "DELEGATION_BLOCKED":"\U0001f6ab"}
                 print(f"         {icons.get(etype,'\U0001f4cb')} {etype}: {evt['agent']}")
 
-        time.sleep(3)
+        time.sleep(1)
 
     # Restore logging
     logging.getLogger("server.live_runner").setLevel(logging.INFO)
@@ -381,7 +381,7 @@ def main():
     else:
         print("    No protocol events captured.")
     print()
-    time.sleep(5)
+    time.sleep(1)
 
     # ---- Step 6: Audit Certificate Verification ----
     section("Step 6: Audit Certificate Verification (0G Storage)")
@@ -396,10 +396,10 @@ def main():
             print(f"      Merkle root: {rec.audit_cid}")
             print(f"      On-chain:    CC={r.cc:.2f} ER={r.er:.2f} AS={r.as_:.2f} IH={r.ih:.2f}")
             print()
-            time.sleep(1.5)
+            time.sleep(0.2)
             shown += 1
     print()
-    time.sleep(3)
+    time.sleep(1)
 
     # ---- Step 7: Final Leaderboard ----
     runner._finalize()
@@ -413,7 +413,7 @@ def main():
         print(f"    Total Rewards:    \u039e {econ['total_rewards_paid']:.4f}")
         print(f"    Total Penalties:  \u039e {econ['total_penalties_collected']:.4f}")
         print()
-        time.sleep(2)
+        time.sleep(0.2)
         agents_sorted = sorted(runner._final_summary["agents"],
                                key=lambda a: a["total_earned"], reverse=True)
         print(f"    {'Model':<45s} {'Tier':>4s} {'Earned':>8s} {'Balance':>8s} {'W/L':>6s}  Strategy")
@@ -422,9 +422,9 @@ def main():
             strat = a.get("strategy", "?")
             print(f"    {a['model_name']:<45s} {a['tier_name']:>4s} {a['total_earned']:>8.4f} "
                   f"{a['balance']:>8.4f} {a['contracts_completed']:>3d}/{a['contracts_failed']:<3d} {strat}")
-            time.sleep(0.6)
+            time.sleep(0.2)
         print()
-        time.sleep(3)
+        time.sleep(1)
         print("  Theorem Validation:")
         for line in [
             "    \u2705 Theorem 1 (Bounded Exposure): No agent exceeded tier budget ceiling",
@@ -433,7 +433,7 @@ def main():
             "    \u2705 Proposition 2 (Collusion Resistance): Adversarial attempts blocked",
         ]:
             print(line)
-            time.sleep(1.5)
+            time.sleep(0.2)
 
     with api._state_lock:
         api._state["status"] = "done"
