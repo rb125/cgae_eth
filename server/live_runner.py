@@ -1035,6 +1035,8 @@ class LiveSimulationRunner:
             # Build agent state and use planning layer to select a task
             available_tasks = get_tasks_for_tier(tier)
             if not available_tasks:
+                if round_num < 3:
+                    print(f"[CGAE]   {model_name}: tier={tier.name} -> no tasks available", flush=True)
                 continue
 
             if autonomous is not None:
@@ -1055,6 +1057,8 @@ class LiveSimulationRunner:
                         task = random.choice(available_tasks)
                     logger.debug(f"{model_name}: forcing visible task {task.task_id} after idle plan")
                 else:
+                    if round_num < 3:
+                        print(f"[CGAE]   {model_name}: planning chose idle", flush=True)
                     logger.debug(f"{model_name}: planning layer chose idle this round")
                     continue
 
@@ -1076,6 +1080,8 @@ class LiveSimulationRunner:
             # Accept contract
             accepted = self.economy.accept_contract(contract.contract_id, agent.agent_id)
             if not accepted:
+                if round_num < 3:
+                    print(f"[CGAE]   {model_name}: accept_contract REJECTED (tier={tier.name}, task={task.task_id})", flush=True)
                 logger.debug(f"{model_name}: Could not accept {task.task_id} (tier/budget)")
                 continue
 
