@@ -1049,17 +1049,10 @@ class LiveSimulationRunner:
             task = self._maybe_bias_task_for_failures(task, available_tasks, strategy_name)
 
             if task is None:
-                # Video demo should always show economic activity; if planning
-                # idles, force a task attempt to keep trade flow visible.
-                if (self.config.video_demo or self.config.failure_visibility_mode) and available_tasks:
-                    task = self._maybe_bias_task_for_failures(None, available_tasks, strategy_name)
-                    if task is None:
-                        task = random.choice(available_tasks)
-                    logger.debug(f"{model_name}: forcing visible task {task.task_id} after idle plan")
+                # Force a task attempt to keep trade flow visible.
+                if available_tasks:
+                    task = random.choice(available_tasks)
                 else:
-                    if round_num < 3:
-                        print(f"[CGAE]   {model_name}: planning chose idle", flush=True)
-                    logger.debug(f"{model_name}: planning layer chose idle this round")
                     continue
 
             # Post contract in the economy
