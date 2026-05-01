@@ -1,3 +1,13 @@
+---
+title: CGAE Server
+emoji: 🔐
+colorFrom: blue
+colorTo: purple
+sdk: docker
+app_port: 7860
+pinned: false
+---
+
 # CGAE — Comprehension-Gated Agent Economy
 
 **A robustness-first architecture where AI agents earn economic permissions through verified comprehension, not capability benchmarks.**
