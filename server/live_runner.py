@@ -465,21 +465,22 @@ class LiveSimulationRunner:
         # --- Step 2: Framework API scores (fallback) -------------------------
         pre = self._load_precomputed(model_name, agent_id)
         if pre is not None:
-            # If AS from framework API is suspiciously low, override with default
-            if pre.as_ < 0.30 and fallback.as_ > pre.as_:
-                pre = RobustnessVector(cc=pre.cc, er=pre.er, as_=fallback.as_, ih=pre.ih)
-                logger.info(f"  {model_name}: AS overridden with default ({fallback.as_:.3f}) — framework API returned < 0.30")
+            # Always use DEFAULT_ROBUSTNESS AS if framework returns < 0.30
+            as_val = pre.as_
+            if as_val < 0.30 and fallback.as_ > as_val:
+                as_val = fallback.as_
+                print(f"[CGAE]   {model_name}: AS overridden {pre.as_:.3f} -> {as_val:.3f}", flush=True)
+            result = RobustnessVector(cc=pre.cc, er=pre.er, as_=as_val, ih=pre.ih)
+            print(f"[CGAE]   {model_name}: CC={result.cc:.3f} ER={result.er:.3f} AS={result.as_:.3f} IH={result.ih:.3f}", flush=True)
             self._audit_quality[model_name] = {
                 "source": "framework_api",
                 "dims_real": ["cc", "er", "as", "ih"],
                 "dims_defaulted": [],
             }
-            return pre
+            return result
 
         # --- Step 3: No data available — use DEFAULT_ROBUSTNESS ---------------
-        logger.warning(
-            f"{model_name}: No audit data from APIs. Using DEFAULT_ROBUSTNESS."
-        )
+        print(f"[CGAE]   {model_name}: using defaults CC={fallback.cc:.3f} ER={fallback.er:.3f} AS={fallback.as_:.3f} IH={fallback.ih:.3f}", flush=True)
         self._audit_quality[model_name] = {
             "source": "default",
             "dims_real": [],

@@ -92,6 +92,9 @@ def _run_economy(num_rounds: int, initial_balance: float):
             runner._round_summaries.append(round_results)
             step_events = runner.economy.step()
 
+            import time
+            time.sleep(2)  # Pace rounds to prevent temporal decay runaway
+
             safety = runner.economy.aggregate_safety()
             agents_snapshot = {}
             for aid, mname in runner.agent_model_map.items():
