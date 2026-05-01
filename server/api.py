@@ -50,6 +50,11 @@ def _run_economy(num_rounds: int, initial_balance: float):
     from dotenv import load_dotenv
     load_dotenv(Path(__file__).resolve().parents[1] / ".env", override=True)
 
+    print(f"[CGAE] Starting economy: rounds={num_rounds}, balance={initial_balance}", flush=True)
+    print(f"[CGAE] AZURE_API_KEY set: {bool(os.environ.get('AZURE_API_KEY'))}", flush=True)
+    print(f"[CGAE] AWS_BEARER_TOKEN_BEDROCK set: {bool(os.environ.get('AWS_BEARER_TOKEN_BEDROCK'))}", flush=True)
+    print(f"[CGAE] PRIVATE_KEY set: {bool(os.environ.get('PRIVATE_KEY'))}", flush=True)
+
     from server.live_runner import LiveSimulationRunner, LiveSimConfig
 
     config = LiveSimConfig(
@@ -62,13 +67,16 @@ def _run_economy(num_rounds: int, initial_balance: float):
         test_eth_top_up_amount=0.3,
     )
 
+    print("[CGAE] Creating LiveSimulationRunner...", flush=True)
     runner = LiveSimulationRunner(config)
 
     with _state_lock:
         _state["status"] = "setup"
         _state["total_rounds"] = num_rounds
 
+    print("[CGAE] Running setup...", flush=True)
     runner.setup()
+    print("[CGAE] Setup complete, starting rounds...", flush=True)
 
     with _state_lock:
         _state["status"] = "running"
@@ -153,6 +161,9 @@ def _run_economy(num_rounds: int, initial_balance: float):
             round_num += 1
 
     except Exception as e:
+        import traceback
+        print(f"[CGAE] Economy runner FAILED: {e}", flush=True)
+        traceback.print_exc()
         logger.exception(f"Economy runner failed: {e}")
     finally:
         with _state_lock:
