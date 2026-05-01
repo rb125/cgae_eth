@@ -60,7 +60,7 @@ def _run_economy(num_rounds: int, initial_balance: float):
     config = LiveSimConfig(
         num_rounds=num_rounds,
         initial_balance=initial_balance,
-        run_live_audit=True,
+        run_live_audit=False,
         self_verify=True,
         max_retries=1,
         test_eth_top_up_threshold=0.05,
