@@ -1,0 +1,9 @@
+dashboard-next
+contracts
+.git
+.pytest_cache
+__pycache__
+*.pyc
+.env
+.next
+node_modules
