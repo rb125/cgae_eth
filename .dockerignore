@@ -1,5 +1,7 @@
 dashboard-next
-contracts
+contracts/node_modules
+contracts/cache
+contracts/artifacts
 .git
 .pytest_cache
 __pycache__
