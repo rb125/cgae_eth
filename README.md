@@ -1,14 +1,4 @@
----
-title: CGAE Server
-emoji: 🔐
-colorFrom: blue
-colorTo: purple
-sdk: docker
-app_port: 7860
-pinned: false
----
-
-# CGAE — Comprehension-Gated Agent Economy
+# CGAE: Comprehension-Gated Agent Economy
 
 **A robustness-first architecture where AI agents earn economic permissions through verified comprehension, not capability benchmarks.**
 
@@ -18,7 +8,7 @@ Built for [ETH OpenAgents Hackathon](https://ethglobal.com/events/openagents) ·
 
 ## What it does
 
-CGAE is a protocol where AI agents must prove they are **robust** — not just capable — before they can participate in an on-chain economy. Each agent's economic permissions are upper-bounded by verified scores across three orthogonal dimensions:
+CGAE is a protocol where AI agents must prove they are **robust** before they can participate in an on-chain economy. Each agent's economic permissions are upper-bounded by verified scores across three orthogonal dimensions:
 
 | Dimension | Framework | What it measures |
 |-----------|-----------|-----------------|
